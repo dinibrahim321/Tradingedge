@@ -1,918 +1,966 @@
 /* =========================================================
-   TRADEFLOW
-   Trading Discipline Dashboard
+   TRADINGEDGE APP ENGINE
    ========================================================= */
 
-document.addEventListener("DOMContentLoaded", function () {
-
-    /* =========================
-       PAGE NAVIGATION
-       ========================= */
-
-    const navButtons = document.querySelectorAll(".nav-btn");
-    const pages = document.querySelectorAll(".page");
-    const pageTitle = document.getElementById("pageTitle");
-
-    navButtons.forEach(function (button) {
-
-        button.addEventListener("click", function () {
-
-            const pageName = button.getAttribute("data-page");
-
-            pages.forEach(function (page) {
-                page.classList.remove("active");
-            });
-
-            const selectedPage = document.getElementById(pageName);
-
-            if (selectedPage) {
-                selectedPage.classList.add("active");
-            }
-
-            navButtons.forEach(function (item) {
-                item.classList.remove("active");
-            });
-
-            button.classList.add("active");
-
-            const titles = {
-                dashboard: "Dashboard",
-                tradeplan: "Trade Plan",
-                calculator: "Risk Calculator",
-                journal: "Trade Journal",
-                analytics: "Analytics",
-                calendar: "Economic Calendar"
-            };
-
-            pageTitle.textContent = titles[pageName] || "TradeFlow";
-
-            const sidebar = document.getElementById("sidebar");
-
-            if (sidebar) {
-                sidebar.classList.remove("open");
-            }
-
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth"
-            });
-
-        });
-
-    });
+const STORAGE_KEY = "tradingEdgeData_v1";
 
 
-    /* =========================
-       MOBILE MENU
-       ========================= */
+/* =========================================================
+   DEFAULT DATA
+   ========================================================= */
 
-    const mobileMenu = document.getElementById("mobileMenu");
-    const sidebar = document.getElementById("sidebar");
+const defaultData = {
+    settings: {
+        balance: 10000,
+        currency: "USD",
+        risk: 1,
+        maxTrades: 3,
+        dailyLoss: 200,
+        minRR: 2
+    },
 
-    if (mobileMenu) {
+    plan: {
+        htf: "4H",
+        entryTF: "15M",
+        notes: "",
+        rules: {}
+    },
 
-        mobileMenu.addEventListener("click", function () {
+    trades: [],
 
-            sidebar.classList.toggle("open");
-
-        });
-
+    discipline: {
+        totalChecks: 0,
+        completedChecks: 0
     }
+};
 
 
-    /* =========================
-       TRADE PLAN CHECKLIST
-       ========================= */
+/* =========================================================
+   DATA STORAGE
+   ========================================================= */
 
-    const checklist = document.querySelectorAll(".plan-check");
-    const tradeGate = document.getElementById("tradeGate");
-    const gateMessage = document.getElementById("gateMessage");
-    const adherence = document.getElementById("adherence");
+function loadData() {
 
-    function updateTradeGate() {
+    try {
 
-        if (!checklist.length) {
-            return;
-        }
-
-        let completed = 0;
-
-        checklist.forEach(function (item) {
-
-            if (item.checked) {
-                completed++;
-            }
-
-        });
-
-        const total = checklist.length;
-
-        const percentage = Math.round(
-            (completed / total) * 100
-        );
-
-        if (adherence) {
-            adherence.textContent = percentage;
-        }
-
-        if (completed === total) {
-
-            tradeGate.classList.remove("blocked");
-            tradeGate.classList.add("allowed");
-
-            tradeGate.querySelector(".gate-status").textContent =
-                "🟢 TRADE ALLOWED";
-
-            gateMessage.textContent =
-                "All requirements completed. Execute only according to your plan.";
-
-        } else {
-
-            tradeGate.classList.remove("allowed");
-            tradeGate.classList.add("blocked");
-
-            tradeGate.querySelector(".gate-status").textContent =
-                "🔴 TRADE BLOCKED";
-
-            gateMessage.textContent =
-                completed +
-                " / " +
-                total +
-                " requirements completed.";
-
-        }
-
-        saveChecklist();
-
-    }
-
-
-    checklist.forEach(function (item) {
-
-        item.addEventListener("change", updateTradeGate);
-
-    });
-
-
-    /* =========================
-       SAVE CHECKLIST
-       ========================= */
-
-    function saveChecklist() {
-
-        const values = [];
-
-        checklist.forEach(function (item) {
-            values.push(item.checked);
-        });
-
-        localStorage.setItem(
-            "tradeflowChecklist",
-            JSON.stringify(values)
-        );
-
-    }
-
-
-    function loadChecklist() {
-
-        const saved = localStorage.getItem(
-            "tradeflowChecklist"
-        );
+        const saved = localStorage.getItem(STORAGE_KEY);
 
         if (!saved) {
-            updateTradeGate();
-            return;
+            return structuredClone(defaultData);
         }
 
-        try {
+        const parsed = JSON.parse(saved);
 
-            const values = JSON.parse(saved);
+        return {
+            ...structuredClone(defaultData),
+            ...parsed,
+            settings: {
+                ...defaultData.settings,
+                ...(parsed.settings || {})
+            },
+            plan: {
+                ...defaultData.plan,
+                ...(parsed.plan || {})
+            },
+            trades: Array.isArray(parsed.trades)
+                ? parsed.trades
+                : []
+        };
 
-            checklist.forEach(function (item, index) {
+    } catch (error) {
 
-                item.checked = values[index] === true;
+        console.error("Unable to load TradingEdge data:", error);
 
-            });
+        return structuredClone(defaultData);
+    }
+}
 
-        } catch (error) {
 
-            console.log("Checklist data could not be loaded.");
+let data = loadData();
 
-        }
 
-        updateTradeGate();
+function saveData() {
 
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(data)
+    );
+
+    updateAll();
+}
+
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+
+function $(id) {
+    return document.getElementById(id);
+}
+
+
+function formatMoney(value) {
+
+    const currency = data.settings.currency || "USD";
+
+    try {
+
+        return new Intl.NumberFormat(
+            undefined,
+            {
+                style: "currency",
+                currency: currency,
+                maximumFractionDigits: 2
+            }
+        ).format(Number(value) || 0);
+
+    } catch {
+
+        return `${currency} ${Number(value || 0).toFixed(2)}`;
+    }
+}
+
+
+function formatR(value) {
+
+    const n = Number(value) || 0;
+
+    return `${n >= 0 ? "+" : ""}${n.toFixed(2)}R`;
+}
+
+
+function todayString() {
+
+    return new Date()
+        .toISOString()
+        .slice(0, 10);
+}
+
+
+function showToast(message) {
+
+    const toast = $("toast");
+
+    if (!toast) return;
+
+    toast.textContent = message;
+    toast.classList.add("show");
+
+    clearTimeout(window.toastTimer);
+
+    window.toastTimer = setTimeout(() => {
+
+        toast.classList.remove("show");
+
+    }, 2500);
+}
+
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+const pageTitles = {
+    dashboard: "Dashboard",
+    plan: "My Plan",
+    trade: "Pre-Trade",
+    calculator: "Risk Calculator",
+    journal: "Journal",
+    analytics: "Analytics",
+    settings: "Settings"
+};
+
+
+function openPage(pageName) {
+
+    document.querySelectorAll(".page").forEach(page => {
+
+        page.classList.toggle(
+            "active",
+            page.id === pageName
+        );
+
+    });
+
+
+    document.querySelectorAll(".nav-btn").forEach(button => {
+
+        button.classList.toggle(
+            "active",
+            button.dataset.page === pageName
+        );
+
+    });
+
+
+    if ($("pageTitle")) {
+        $("pageTitle").textContent =
+            pageTitles[pageName] || "TradingEdge";
     }
 
 
-    loadChecklist();
+    const sidebar = $("sidebar");
+
+    if (sidebar) {
+        sidebar.classList.remove("open");
+    }
 
 
-    /* =========================
-       RESET CHECKLIST
-       ========================= */
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
 
-    const resetPlan = document.getElementById("resetPlan");
 
-    if (resetPlan) {
+document.querySelectorAll(".nav-btn").forEach(button => {
 
-        resetPlan.addEventListener("click", function () {
+    button.addEventListener("click", () => {
 
-            checklist.forEach(function (item) {
+        openPage(button.dataset.page);
 
-                item.checked = false;
+    });
 
-            });
+});
 
-            localStorage.removeItem(
-                "tradeflowChecklist"
-            );
 
-            updateTradeGate();
+document.querySelectorAll("[data-go]").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        openPage(button.dataset.go);
+
+    });
+
+});
+
+
+const mobileMenu = $("mobileMenu");
+
+if (mobileMenu) {
+
+    mobileMenu.addEventListener("click", () => {
+
+        $("sidebar").classList.toggle("open");
+
+    });
+
+}
+
+
+/* =========================================================
+   DATE
+   ========================================================= */
+
+function updateDate() {
+
+    const element = $("currentDate");
+
+    if (!element) return;
+
+    const date = new Date();
+
+    element.textContent =
+        date.toLocaleDateString(
+            undefined,
+            {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric"
+            }
+        );
+}
+
+
+/* =========================================================
+   SETTINGS
+   ========================================================= */
+
+function loadSettingsIntoUI() {
+
+    const s = data.settings;
+
+    if ($("settingBalance"))
+        $("settingBalance").value = s.balance;
+
+    if ($("settingCurrency"))
+        $("settingCurrency").value = s.currency;
+
+    if ($("settingRisk"))
+        $("settingRisk").value = s.risk;
+
+    if ($("settingMaxTrades"))
+        $("settingMaxTrades").value = s.maxTrades;
+
+    if ($("settingDailyLoss"))
+        $("settingDailyLoss").value = s.dailyLoss;
+
+    if ($("settingMinRR"))
+        $("settingMinRR").value = s.minRR;
+
+
+    if ($("calcBalance"))
+        $("calcBalance").value = s.balance;
+
+    if ($("calcRisk"))
+        $("calcRisk").value = s.risk;
+}
+
+
+function saveSettings() {
+
+    const balance =
+        Number($("settingBalance").value);
+
+    const risk =
+        Number($("settingRisk").value);
+
+    const maxTrades =
+        Number($("settingMaxTrades").value);
+
+    const dailyLoss =
+        Number($("settingDailyLoss").value);
+
+    const minRR =
+        Number($("settingMinRR").value);
+
+    if (
+        !Number.isFinite(balance) ||
+        balance <= 0
+    ) {
+
+        showToast("Enter a valid account balance.");
+
+        return;
+    }
+
+
+    if (
+        !Number.isFinite(risk) ||
+        risk <= 0
+    ) {
+
+        showToast("Enter a valid risk percentage.");
+
+        return;
+    }
+
+
+    if (
+        !Number.isFinite(maxTrades) ||
+        maxTrades < 1
+    ) {
+
+        showToast("Maximum trades must be at least 1.");
+
+        return;
+    }
+
+
+    if (
+        !Number.isFinite(dailyLoss) ||
+        dailyLoss < 0
+    ) {
+
+        showToast("Enter a valid daily loss limit.");
+
+        return;
+    }
+
+
+    if (
+        !Number.isFinite(minRR) ||
+        minRR < 0
+    ) {
+
+        showToast("Enter a valid minimum R:R.");
+
+        return;
+    }
+
+
+    data.settings = {
+
+        balance,
+        currency: $("settingCurrency").value,
+        risk,
+        maxTrades,
+        dailyLoss,
+        minRR
+
+    };
+
+
+    saveData();
+
+    showToast("Trading rules saved.");
+}
+
+
+$("saveSettings")?.addEventListener(
+    "click",
+    saveSettings
+);
+
+
+/* =========================================================
+   PLAN
+   ========================================================= */
+
+function loadPlanIntoUI() {
+
+    const p = data.plan;
+
+    if ($("planHTF"))
+        $("planHTF").value = p.htf;
+
+    if ($("planEntryTF"))
+        $("planEntryTF").value = p.entryTF;
+
+    if ($("planNotes"))
+        $("planNotes").value = p.notes || "";
+
+
+    document.querySelectorAll(".plan-rule")
+        .forEach(input => {
+
+            input.checked =
+                Boolean(
+                    p.rules[input.dataset.rule]
+                );
+
+        });
+}
+
+
+function savePlan() {
+
+    const rules = {};
+
+    document.querySelectorAll(".plan-rule")
+        .forEach(input => {
+
+            rules[input.dataset.rule] =
+                input.checked;
 
         });
 
+
+    data.plan = {
+
+        htf: $("planHTF").value,
+
+        entryTF:
+            $("planEntryTF").value,
+
+        notes:
+            $("planNotes").value.trim(),
+
+        rules
+
+    };
+
+
+    saveData();
+
+    showToast("Trading plan saved.");
+}
+
+
+$("savePlan")?.addEventListener(
+    "click",
+    savePlan
+);
+
+
+/* =========================================================
+   PRE-TRADE CHECKLIST
+   ========================================================= */
+
+function updateTradeChecklist() {
+
+    const checks =
+        document.querySelectorAll(".trade-check");
+
+    const completed =
+        document.querySelectorAll(
+            ".trade-check:checked"
+        ).length;
+
+    const total = checks.length;
+
+    const percentage =
+        total === 0
+            ? 0
+            : Math.round(
+                (completed / total) * 100
+            );
+
+
+    if ($("checkCompleted"))
+        $("checkCompleted").textContent =
+            completed;
+
+    if ($("checkTotal"))
+        $("checkTotal").textContent =
+            total;
+
+    if ($("executionPercentage"))
+        $("executionPercentage").textContent =
+            `${percentage}%`;
+
+
+    const gate =
+        $("executionGate");
+
+    const message =
+        $("executionMessage");
+
+
+    if (!gate) return;
+
+
+    if (completed === total && total > 0) {
+
+        gate.className =
+            "trade-gate allowed";
+
+        gate.querySelector(".gate-status")
+            .textContent =
+            "🟢 TRADE ALLOWED";
+
+        message.textContent =
+            "All pre-trade conditions are satisfied.";
+
+    } else {
+
+        gate.className =
+            "trade-gate blocked";
+
+        gate.querySelector(".gate-status")
+            .textContent =
+            "🔴 TRADE BLOCKED";
+
+        message.textContent =
+            `${total - completed} requirement(s) remaining.`;
+
     }
+}
 
 
-    /* =========================
-       RISK CALCULATOR
-       ========================= */
+document.querySelectorAll(".trade-check")
+    .forEach(input => {
 
-    const calculateRisk =
-        document.getElementById("calculateRisk");
+        input.addEventListener(
+            "change",
+            updateTradeChecklist
+        );
 
-    function calculatePosition() {
+    });
 
-        const balance =
-            Number(document.getElementById("balance").value);
 
-        const riskPercent =
-            Number(document.getElementById("riskPercent").value);
+$("resetTradeCheck")?.addEventListener(
+    "click",
+    () => {
 
-        const entry =
-            Number(document.getElementById("entry").value);
+        document.querySelectorAll(".trade-check")
+            .forEach(input => {
 
-        const stop =
-            Number(document.getElementById("stop").value);
+                input.checked = false;
 
-        const target =
-            Number(document.getElementById("target").value);
+            });
 
-        const pair =
-            document.getElementById("pair").value;
+        updateTradeChecklist();
 
+        showToast("Checklist reset.");
+
+    }
+);
+
+
+$("continueToCalculator")
+    ?.addEventListener("click", () => {
+
+        const checks =
+            document.querySelectorAll(".trade-check");
+
+        const completed =
+            document.querySelectorAll(
+                ".trade-check:checked"
+            ).length;
 
         if (
-            !balance ||
-            !riskPercent ||
-            !entry ||
-            !stop ||
-            !target
+            completed !== checks.length
         ) {
+
+            showToast(
+                "Complete the checklist before continuing."
+            );
+
             return;
         }
 
-
-        /* Money risk */
-
-        const moneyRisk =
-            balance * (riskPercent / 100);
-
-
-        /* Price distance */
-
-        const stopDistance =
-            Math.abs(entry - stop);
-
-        const rewardDistance =
-            Math.abs(target - entry);
-
-
-        /* R:R */
-
-        let rr = 0;
-
-        if (stopDistance > 0) {
-
-            rr =
-                rewardDistance /
-                stopDistance;
-
-        }
-
-
-        /* Pip calculation */
-
-        let pipSize = 0.0001;
-
-        if (pair.includes("JPY")) {
-            pipSize = 0.01;
-        }
-
-        /*
-           This is a simplified calculator.
-
-           Standard USD-quoted forex pairs:
-           approximately $10 per pip per standard lot.
-
-           XAU/USD is intentionally not treated
-           as a normal forex pair.
-        */
-
-        let lots = 0;
-
-        if (pair === "XAU/USD") {
-
-            const movement =
-                stopDistance;
-
-            if (movement > 0) {
-
-                lots =
-                    moneyRisk /
-                    (movement * 100);
-
-            }
-
-        } else {
-
-            const pips =
-                stopDistance / pipSize;
-
-            if (pips > 0) {
-
-                lots =
-                    moneyRisk /
-                    (pips * 10);
-
-            }
-
-        }
-
-
-        const potentialProfit =
-            moneyRisk * rr;
-
-
-        const pips =
-            stopDistance / pipSize;
-
-
-        /* Display */
-
-        document.getElementById("moneyRisk").textContent =
-            "$" + moneyRisk.toFixed(2);
-
-        document.getElementById("stopDistance").textContent =
-            pips.toFixed(1) + " pips";
-
-        document.getElementById("rewardRisk").textContent =
-            rr.toFixed(2) + "R";
-
-        document.getElementById("potentialProfit").textContent =
-            "$" + potentialProfit.toFixed(2);
-
-
-        /* Save calculator data */
-
-        localStorage.setItem(
-            "tradeflowCalculator",
-            JSON.stringify({
-                balance: balance,
-                riskPercent: riskPercent,
-                entry: entry,
-                stop: stop,
-                target: target,
-                pair: pair
-            })
-        );
-
-    }
-
-
-    if (calculateRisk) {
-
-        calculateRisk.addEventListener(
-            "click",
-            calculatePosition
-        );
-
-    }
-
-
-    /* =========================
-       AUTO CALCULATE
-       ========================= */
-
-    const calculatorInputs = [
-        "balance",
-        "riskPercent",
-        "entry",
-        "stop",
-        "target",
-        "pair"
-    ];
-
-    calculatorInputs.forEach(function (id) {
-
-        const input = document.getElementById(id);
-
-        if (input) {
-
-            input.addEventListener(
-                "input",
-                calculatePosition
-            );
-
-            input.addEventListener(
-                "change",
-                calculatePosition
-            );
-
-        }
+        openPage("calculator");
 
     });
 
 
-    /* =========================
-       LOAD CALCULATOR
-       ========================= */
+/* =========================================================
+   DAILY STATS
+   ========================================================= */
 
-    function loadCalculator() {
+function getTodayTrades() {
 
-        const saved =
-            localStorage.getItem(
-                "tradeflowCalculator"
-            );
+    const today = todayString();
 
-        if (!saved) {
-
-            calculatePosition();
-
-            return;
-
-        }
-
-        try {
-
-            const data =
-                JSON.parse(saved);
-
-            if (data.balance !== undefined) {
-                document.getElementById("balance").value =
-                    data.balance;
-            }
-
-            if (data.riskPercent !== undefined) {
-                document.getElementById("riskPercent").value =
-                    data.riskPercent;
-            }
-
-            if (data.entry !== undefined) {
-                document.getElementById("entry").value =
-                    data.entry;
-            }
-
-            if (data.stop !== undefined) {
-                document.getElementById("stop").value =
-                    data.stop;
-            }
-
-            if (data.target !== undefined) {
-                document.getElementById("target").value =
-                    data.target;
-            }
-
-            if (data.pair !== undefined) {
-                document.getElementById("pair").value =
-                    data.pair;
-            }
-
-        } catch (error) {
-
-            console.log(
-                "Calculator data could not be loaded."
-            );
-
-        }
-
-        calculatePosition();
-
-    }
+    return data.trades.filter(
+        trade =>
+            trade.date === today
+    );
+}
 
 
-    loadCalculator();
+function getTodayLoss() {
+
+    return getTodayTrades()
+        .filter(trade =>
+            Number(trade.pl) < 0
+        )
+        .reduce(
+            (sum, trade) =>
+                sum + Math.abs(Number(trade.pl) || 0),
+            0
+        );
+}
 
 
-    /* =========================
-       TRADE COUNT
-       ========================= */
+/* =========================================================
+   DASHBOARD
+   ========================================================= */
 
-    let tradesToday = 2;
+function updateDashboard() {
 
-    const tradeCount =
-        document.getElementById("tradeCount");
+    const trades = data.trades;
 
-    function updateTradeCount() {
-
-        if (tradeCount) {
-
-            tradeCount.textContent =
-                tradesToday;
-
-        }
-
-        updateTradingLock();
-
-    }
+    const balance =
+        Number(data.settings.balance) || 0;
 
 
-    /* =========================
-       TRADING LOCK
-       ========================= */
-
-    function updateTradingLock() {
-
-        const gate =
-            document.querySelector(
-                "#dashboard .trade-gate"
-            );
-
-        if (!gate) {
-            return;
-        }
-
-
-        if (tradesToday >= 3) {
-
-            gate.classList.remove("allowed");
-            gate.classList.add("blocked");
-
-            gate.querySelector(".gate-status").textContent =
-                "🔴 TRADING LOCKED";
-
-            gate.querySelector("small").textContent =
-                "Maximum daily trades reached.";
-
-        } else {
-
-            gate.classList.remove("blocked");
-            gate.classList.add("allowed");
-
-            gate.querySelector(".gate-status").textContent =
-                "🟢 TRADE ALLOWED";
-
-            gate.querySelector("small").textContent =
-                (3 - tradesToday) +
-                " trade(s) remaining today.";
-
-        }
-
-    }
-
-
-    updateTradeCount();
-
-
-    /* =========================
-       QUICK TRADE
-       ========================= */
-
-    const quickTrade =
-        document.getElementById("quickTrade");
-
-    if (quickTrade) {
-
-        quickTrade.addEventListener(
-            "click",
-            function () {
-
-                const journalButton =
-                    document.querySelector(
-                        '[data-page="journal"]'
-                    );
-
-                if (journalButton) {
-                    journalButton.click();
-                }
-
-            }
+    const pnl =
+        trades.reduce(
+            (sum, trade) =>
+                sum + (Number(trade.pl) || 0),
+            0
         );
 
-    }
+
+    const wins =
+        trades.filter(
+            trade =>
+                trade.result === "WIN"
+        ).length;
 
 
-    /* =========================
-       NEW TRADE
-       ========================= */
-
-    const newTrade =
-        document.getElementById("newTrade");
-
-    if (newTrade) {
-
-        newTrade.addEventListener(
-            "click",
-            function () {
-
-                if (tradesToday >= 3) {
-
-                    alert(
-                        "TRADING LOCKED\n\n" +
-                        "You already reached your maximum " +
-                        "of 3 trades today."
-                    );
-
-                    return;
-
-                }
+    const winRate =
+        trades.length
+            ? Math.round(
+                (wins / trades.length) * 100
+            )
+            : 0;
 
 
-                const pair =
-                    prompt(
-                        "Enter pair:",
-                        "EUR/USD"
-                    );
-
-                if (!pair) {
-                    return;
-                }
+    const todayTrades =
+        getTodayTrades().length;
 
 
-                const direction =
-                    prompt(
-                        "Direction: BUY or SELL",
-                        "BUY"
-                    );
-
-                if (!direction) {
-                    return;
-                }
+    const todayLoss =
+        getTodayLoss();
 
 
-                const setup =
-                    prompt(
-                        "Setup:",
-                        "Demand + MSS"
-                    );
-
-                if (!setup) {
-                    return;
-                }
+    const maxTrades =
+        Number(data.settings.maxTrades) || 1;
 
 
-                const entry =
-                    prompt(
-                        "Entry price:",
-                        "1.16500"
-                    );
-
-                const stop =
-                    prompt(
-                        "Stop loss:",
-                        "1.16300"
-                    );
-
-                const target =
-                    prompt(
-                        "Take profit:",
-                        "1.16900"
-                    );
+    const dailyLoss =
+        Number(data.settings.dailyLoss) || 0;
 
 
-                const result =
-                    prompt(
-                        "Result: WIN or LOSS",
-                        "WIN"
-                    );
-
-
-                const r =
-                    prompt(
-                        "R result:",
-                        result &&
-                        result.toUpperCase() === "WIN"
-                            ? "2"
-                            : "-1"
-                    );
-
-
-                if (
-                    !entry ||
-                    !stop ||
-                    !target ||
-                    !result ||
-                    !r
-                ) {
-                    return;
-                }
-
-
-                const table =
-                    document.getElementById(
-                        "journalBody"
-                    );
-
-
-                const row =
-                    document.createElement("tr");
-
-
-                const resultUpper =
-                    result.toUpperCase();
-
-
-                const rNumber =
-                    Number(r);
-
-
-                const resultClass =
-                    resultUpper === "WIN"
-                        ? "green"
-                        : "red";
-
-
-                row.innerHTML = `
-                    <td>${pair}</td>
-                    <td>${direction.toUpperCase()}</td>
-                    <td>${setup}</td>
-                    <td>${entry}</td>
-                    <td>${stop}</td>
-                    <td>${target}</td>
-                    <td class="${resultClass}">
-                        ${resultUpper}
-                    </td>
-                    <td class="${resultClass}">
-                        ${rNumber > 0 ? "+" : ""}
-                        ${rNumber}R
-                    </td>
-                `;
-
-
-                table.prepend(row);
-
-
-                tradesToday++;
-
-                updateTradeCount();
-
-
-                saveTrade({
-                    pair: pair,
-                    direction: direction.toUpperCase(),
-                    setup: setup,
-                    entry: entry,
-                    stop: stop,
-                    target: target,
-                    result: resultUpper,
-                    r: rNumber
-                });
-
-
-                alert(
-                    "Trade saved successfully."
-                );
-
-            }
+    const tradePercentage =
+        Math.min(
+            100,
+            (todayTrades / maxTrades) * 100
         );
 
+
+    const lossPercentage =
+        dailyLoss > 0
+            ? Math.min(
+                100,
+                (todayLoss / dailyLoss) * 100
+            )
+            : 0;
+
+
+    const discipline =
+        calculateDiscipline();
+
+
+    setText(
+        "dashBalance",
+        formatMoney(balance)
+    );
+
+    setText(
+        "dashPnl",
+        formatMoney(pnl)
+    );
+
+    setText(
+        "dashPnlPercent",
+        balance
+            ? `${((pnl / balance) * 100).toFixed(2)}%`
+            : "0.00%"
+    );
+
+    setText(
+        "dashWinRate",
+        `${winRate}%`
+    );
+
+    setText(
+        "dashTradeCount",
+        `${trades.length} trades`
+    );
+
+    setText(
+        "dashDiscipline",
+        `${discipline}%`
+    );
+
+    setText(
+        "sideDiscipline",
+        `${discipline}%`
+    );
+
+    setText(
+        "todayTrades",
+        todayTrades
+    );
+
+    setText(
+        "maxTradesDisplay",
+        maxTrades
+    );
+
+    setText(
+        "todayLoss",
+        todayLoss.toFixed(2)
+    );
+
+    setText(
+        "dailyLossDisplay",
+        dailyLoss.toFixed(2)
+    );
+
+    setText(
+        "riskDisplay",
+        data.settings.risk
+    );
+
+
+    if ($("tradeProgress"))
+        $("tradeProgress").style.width =
+            `${tradePercentage}%`;
+
+    if ($("lossProgress"))
+        $("lossProgress").style.width =
+            `${lossPercentage}%`;
+
+
+    const gate =
+        $("dashboardGate");
+
+    const gateMessage =
+        $("dashboardGateMessage");
+
+
+    const blockedByTrades =
+        todayTrades >= maxTrades;
+
+    const blockedByLoss =
+        dailyLoss > 0 &&
+        todayLoss >= dailyLoss;
+
+
+    if (
+        blockedByTrades ||
+        blockedByLoss
+    ) {
+
+        gate.className =
+            "trade-gate blocked";
+
+        gate.querySelector(".gate-status")
+            .textContent =
+            "🔴 TRADING LOCKED";
+
+        gateMessage.textContent =
+            blockedByTrades
+                ? "Daily trade limit reached."
+                : "Daily loss limit reached.";
+
+    } else {
+
+        gate.className =
+            "trade-gate allowed";
+
+        gate.querySelector(".gate-status")
+            .textContent =
+            "🟢 TRADING AVAILABLE";
+
+        gateMessage.textContent =
+            "You may begin your pre-trade checklist.";
+
     }
 
 
-    /* =========================
-       SAVE JOURNAL
-       ========================= */
-
-    function saveTrade(trade) {
-
-        let trades = [];
-
-        const saved =
-            localStorage.getItem(
-                "tradeflowTrades"
-            );
-
-        if (saved) {
-
-            try {
-
-                trades =
-                    JSON.parse(saved);
-
-            } catch (error) {
-
-                trades = [];
-
-            }
-
-        }
+    renderRecentTrades();
+}
 
 
-        trades.push(trade);
+/* =========================================================
+   RECENT TRADES
+   ========================================================= */
+
+function renderRecentTrades() {
+
+    const body =
+        $("recentTrades");
+
+    if (!body) return;
 
 
-        localStorage.setItem(
-            "tradeflowTrades",
-            JSON.stringify(trades)
-        );
+    const trades =
+        [...data.trades]
+            .reverse()
+            .slice(0, 5);
 
+
+    if (!trades.length) {
+
+        body.innerHTML = `
+            <tr>
+                <td colspan="7" class="empty">
+                    No trades recorded yet.
+                </td>
+            </tr>
+        `;
+
+        return;
     }
 
 
-    /* =========================
-       LOAD JOURNAL
-       ========================= */
+    body.innerHTML =
+        trades.map(trade => {
 
-    function loadTrades() {
-
-        const saved =
-            localStorage.getItem(
-                "tradeflowTrades"
-            );
-
-        if (!saved) {
-            return;
-        }
+            const resultClass =
+                trade.result === "WIN"
+                    ? "green"
+                    : trade.result === "LOSS"
+                        ? "red"
+                        : "yellow";
 
 
-        try {
+            const r =
+                Number(trade.r) || 0;
 
-            const trades =
-                JSON.parse(saved);
-
-            const table =
-                document.getElementById(
-                    "journalBody"
-                );
+            const pl =
+                Number(trade.pl) || 0;
 
 
-            trades.forEach(function (trade) {
+            return `
+                <tr>
 
-                const row =
-                    document.createElement("tr");
+                    <td>${escapeHTML(trade.date)}</td>
 
+                    <td>${escapeHTML(trade.pair)}</td>
 
-                const resultClass =
-                    trade.result === "WIN"
-                        ? "green"
-                        : "red";
+                    <td>${escapeHTML(trade.direction)}</td>
 
+                    <td>${escapeHTML(trade.setup)}</td>
 
-                row.innerHTML = `
-                    <td>${trade.pair}</td>
-                    <td>${trade.direction}</td>
-                    <td>${trade.setup}</td>
-                    <td>${trade.entry}</td>
-                    <td>${trade.stop}</td>
-                    <td>${trade.target}</td>
                     <td class="${resultClass}">
-                        ${trade.result}
+                        ${escapeHTML(trade.result)}
                     </td>
-                    <td class="${resultClass}">
-                        ${trade.r > 0 ? "+" : ""}
-                        ${trade.r}R
+
+                    <td class="${r >= 0 ? "green" : "red"}">
+                        ${formatR(r)}
                     </td>
-                `;
+
+                    <td class="${pl >= 0 ? "green" : "red"}">
+                        ${formatMoney(pl)}
+                    </td>
+
+                </tr>
+            `;
+
+        }).join("");
+}
 
 
-                table.prepend(row);
+/* =========================================================
+   JOURNAL
+   ========================================================= */
 
-            });
+function openTradeModal() {
 
+    $("tradeModal")
+        ?.classList.add("open");
 
-        } catch (error) {
-
-            console.log(
-                "Journal data could not be loaded."
-            );
-
-        }
-
-    }
+}
 
 
-    loadTrades();
+function closeTradeModal() {
+
+    $("tradeModal")
+        ?.classList.remove("open");
+
+}
 
 
-    /* =========================
-       KEYBOARD SHORTCUT
-       ========================= */
+$("openTradeModal")
+    ?.addEventListener(
+        "click",
+        openTradeModal
+    );
 
-    document.addEventListener(
-        "keydown",
-        function (event) {
 
-            /*
-              Press ESC to close mobile sidebar.
-            */
+$("closeTradeModal")
+    ?.addEventListener(
+        "click",
+        closeTradeModal
+    );
 
-            if (event.key === "Escape") {
 
-                if (sidebar) {
-                    sidebar.classList.remove("open");
-                }
+$("cancelTrade")
+    ?.addEventListener(
+        "click",
+        closeTradeModal
+    );
+
+
+$("tradeModal")
+    ?.addEventListener(
+        "click",
+        event => {
+
+            if (
+                event.target ===
+                $("tradeModal")
+            ) {
+
+                closeTradeModal();
 
             }
 
@@ -920,12 +968,144 @@ document.addEventListener("DOMContentLoaded", function () {
     );
 
 
-    /* =========================
-       STARTUP
-       ========================= */
+$("tradeForm")
+    ?.addEventListener(
+        "submit",
+        event => {
 
-    updateTradeGate();
-    updateTradingLock();
-    calculatePosition();
+            event.preventDefault();
 
-});
+
+            const trade = {
+
+                id:
+                    Date.now().toString(),
+
+                date:
+                    todayString(),
+
+                pair:
+                    $("tradePair").value
+                        .trim()
+                        .toUpperCase(),
+
+                direction:
+                    $("tradeDirection").value,
+
+                setup:
+                    $("tradeSetup").value
+                        .trim(),
+
+                result:
+                    $("tradeResult").value,
+
+                r:
+                    Number($("tradeR").value),
+
+                pl:
+                    Number($("tradePL").value),
+
+                notes:
+                    $("tradeNotes").value.trim()
+
+            };
+
+
+            if (!trade.pair || !trade.setup) {
+
+                showToast(
+                    "Complete the required fields."
+                );
+
+                return;
+            }
+
+
+            if (
+                !Number.isFinite(trade.r) ||
+                !Number.isFinite(trade.pl)
+            ) {
+
+                showToast(
+                    "Enter valid R and P/L values."
+                );
+
+                return;
+            }
+
+
+            data.trades.push(trade);
+
+            saveData();
+
+            $("tradeForm").reset();
+
+            closeTradeModal();
+
+            showToast("Trade added to journal.");
+
+        }
+    );
+
+
+function renderJournal() {
+
+    const body =
+        $("journalBody");
+
+    if (!body) return;
+
+
+    const trades =
+        [...data.trades]
+            .reverse();
+
+
+    if (!trades.length) {
+
+        body.innerHTML = `
+            <tr>
+                <td colspan="8" class="empty">
+                    No trades yet. Start your journal.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+
+    body.innerHTML =
+        trades.map(trade => {
+
+            const r =
+                Number(trade.r) || 0;
+
+            const pl =
+                Number(trade.pl) || 0;
+
+
+            const resultClass =
+                trade.result === "WIN"
+                    ? "green"
+                    : trade.result === "LOSS"
+                        ? "red"
+                        : "yellow";
+
+
+            return `
+                <tr>
+
+                    <td>${escapeHTML(trade.date)}</td>
+
+                    <td>${escapeHTML(trade.pair)}</td>
+
+                    <td>${escapeHTML(trade.direction)}</td>
+
+                    <td>${escapeHTML(trade.setup)}</td>
+
+                    <td class="${resultClass}">
+                        ${escapeHTML(trade.result)}
+                    </td>
+
+                    <td class="${r >= 0
