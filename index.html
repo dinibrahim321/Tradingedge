@@ -1427,27 +1427,93 @@ document.querySelector('[data-page="calculator"]').click();
 
 
 /* PLAN */
+function renderMyRules(){
+
+const container=$("myRules");
+
+if(!container)return;
+
+if(!Array.isArray(data.plan.rules)){
+data.plan.rules=[];
+}
+
+container.innerHTML="";
+
+data.plan.rules.forEach(function(rule,index){
+
+const box=document.createElement("div");
+
+box.style.display="flex";
+box.style.gap="8px";
+box.style.marginBottom="10px";
+
+box.innerHTML=
+'<input type="text" value="'+
+String(rule).replace(/"/g,"&quot;")+
+'" data-rule="'+index+'" style="flex:1">'+
+'<button class="danger" type="button" data-delete="'+index+'">Delete</button>';
+
+container.appendChild(box);
+
+});
+
+container.querySelectorAll("[data-delete]").forEach(function(button){
+
+button.addEventListener("click",function(){
+
+const index=Number(button.getAttribute("data-delete"));
+
+data.plan.rules.splice(index,1);
+
+renderMyRules();
+
+});
+
+});
+
+}
+
+$("addRule").addEventListener("click",function(){
+
+if(!Array.isArray(data.plan.rules)){
+data.plan.rules=[];
+}
+
+data.plan.rules.push("New trading rule");
+
+renderMyRules();
+
+});
 
 $("savePlan").addEventListener("click",function(){
 
 const rules=[];
 
-document.querySelectorAll(".planrule").forEach(function(rule){
-rules.push(rule.checked);
+document.querySelectorAll("[data-rule]").forEach(function(input){
+
+const text=input.value.trim();
+
+if(text){
+rules.push(text);
+}
+
 });
 
-data.plan={
-htf:$("htf").value,
-entry:$("entrytf").value,
-notes:$("notes").value,
-rules:rules
-};
+data.plan.htf=$("htf").value;
+data.plan.entry=$("entrytf").value;
+data.plan.notes=$("notes").value;
+data.plan.rules=rules;
 
 save();
+
+renderMyRules();
 
 toast("Trading plan saved.");
 
 });
+
+renderMyRules();
+
 
 
 /* SETTINGS */
