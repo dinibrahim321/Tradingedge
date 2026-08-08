@@ -728,7 +728,7 @@ Reset
 <div id="checkbar"></div>
 </div>
 
-<div id="checks">
+<div id="checks"></div>
 
 <label class="check">
 <input type="checkbox">
@@ -1176,7 +1176,12 @@ P/L
 Setup
 <input id="tSetup" placeholder="Supply + Liquidity" required>
 </label>
+<label>
+  Chart Screenshot
+  <input type="file" id="tScreenshot" accept="image/*">
+</label>
 
+<div id="screenshotPreview"></div>
 <label>
 Notes
 <textarea id="tNotes"></textarea>
@@ -1333,75 +1338,6 @@ day:"numeric"
 /* CHECKLIST */
 
 const checks=document.querySelectorAll("#checks input");
-
-function updateChecklist(){
-
-let completed=0;
-
-checks.forEach(function(check){
-
-if(check.checked){
-completed++;
-}
-
-});
-
-const total=checks.length;
-
-const percentage=total
-?Math.round(completed/total*100)
-:0;
-
-$("done").textContent=completed;
-$("percent").textContent=percentage+"%";
-$("checkbar").style.width=percentage+"%";
-
-if(completed===total){
-
-$("tradeGate").className="gate ok";
-
-$("tradeGate").innerHTML=
-"<strong>🟢 TRADE ALLOWED</strong>"+
-"<p>All checklist conditions are satisfied.</p>";
-
-}else{
-
-$("tradeGate").className="gate bad";
-
-$("tradeGate").innerHTML=
-"<strong>🔴 TRADE BLOCKED</strong>"+
-"<p>"+(total-completed)+" requirement(s) remaining.</p>";
-
-}
-
-}
-
-checks.forEach(function(check){
-check.addEventListener("change",updateChecklist);
-});
-
-
-$("reset").addEventListener("click",function(){
-
-checks.forEach(function(check){
-check.checked=false;
-});
-
-updateChecklist();
-
-toast("Checklist reset.");
-
-});
-
-
-$("startTrade").addEventListener("click",function(){
-
-document.querySelector('[data-page="checklist"]').click();
-
-});
-
-
-$("calculatorButton").addEventListener("click",function(){
 
 let completed=0;
 
@@ -1616,11 +1552,29 @@ this.classList.remove("open");
 });
 
 
-$("tradeform").addEventListener("submit",function(event){
+$("tradeform").addEventListener("submit",async function(event){
 
 event.preventDefault();
 
-const trade={
+const trade={const screenshotFile=$("tScreenshot").files[0];
+
+let screenshot="";
+
+if(screenshotFile){
+
+screenshot=await new Promise(function(resolve){
+
+const reader=new FileReader();
+
+reader.onload=function(){
+resolve(reader.result);
+};
+
+reader.readAsDataURL(screenshotFile);
+
+});
+
+  }
 id:Date.now(),
 date:new Date().toISOString().slice(0,10),
 pair:$("tPair").value.trim().toUpperCase(),
@@ -1629,6 +1583,7 @@ result:$("tResult").value,
 r:Number($("tR").value),
 pl:Number($("tPL").value),
 setup:$("tSetup").value.trim(),
+screenshot:screenshot,
 notes:$("tNotes").value.trim()
 };
 
@@ -1704,7 +1659,9 @@ recentHTML+=
 $("recent").innerHTML=recentHTML;
 
 let journalHTML="";
-
+const image=trade.screenshot
+?'<img src="'+trade.screenshot+'" style="width:100px;border-radius:6px">'
+:"No screenshot";
 trades.forEach(function(trade){
 
 const resultColor=
