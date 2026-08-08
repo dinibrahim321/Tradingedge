@@ -4,11 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#080c11">
-    <title>TradeFlow - Trading Discipline</title>
+    <meta name="description" content="TradingEdge - Personal trading discipline and journal system">
+    <title>TradingEdge</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
+
+<div id="toast" class="toast"></div>
 
 <div class="app">
 
@@ -17,41 +20,50 @@
 
         <div class="logo">
             <div class="logo-box">T</div>
-            <span>TradeFlow</span>
+            <span>TradingEdge</span>
         </div>
 
         <nav class="nav">
 
             <button class="nav-btn active" data-page="dashboard">
-                📊 Dashboard
+                <span>▣</span> Dashboard
             </button>
 
-            <button class="nav-btn" data-page="tradeplan">
-                ✓ Trade Plan
+            <button class="nav-btn" data-page="plan">
+                <span>✓</span> My Plan
+            </button>
+
+            <button class="nav-btn" data-page="trade">
+                <span>＋</span> Pre-Trade
             </button>
 
             <button class="nav-btn" data-page="calculator">
-                🧮 Risk Calculator
+                <span>⌁</span> Risk Calculator
             </button>
 
             <button class="nav-btn" data-page="journal">
-                📖 Trade Journal
+                <span>▤</span> Journal
             </button>
 
             <button class="nav-btn" data-page="analytics">
-                📈 Analytics
+                <span>◈</span> Analytics
             </button>
 
-            <button class="nav-btn" data-page="calendar">
-                📰 Calendar
+            <button class="nav-btn" data-page="settings">
+                <span>⚙</span> Settings
             </button>
 
         </nav>
 
-        <div class="user-box">
-            <strong>Trader</strong>
-            <br>
-            <small>Discipline Mode</small>
+        <div class="sidebar-bottom">
+
+            <div class="discipline-mini">
+                <span>Discipline</span>
+                <strong id="sideDiscipline">100%</strong>
+            </div>
+
+            <small>TradingEdge</small>
+
         </div>
 
     </aside>
@@ -60,152 +72,118 @@
     <!-- MAIN -->
     <main class="main">
 
-        <!-- TOP BAR -->
         <header class="topbar">
 
             <button class="mobile-button" id="mobileMenu">
                 ☰
             </button>
 
-            <h1 id="pageTitle">Dashboard</h1>
+            <div>
+                <h1 id="pageTitle">Dashboard</h1>
+                <span id="currentDate" class="muted"></span>
+            </div>
 
-            <div class="status">
-                ● SYSTEM ACTIVE
+            <div id="systemStatus" class="system-status">
+                ● READY
             </div>
 
         </header>
 
 
-        <!-- ================= DASHBOARD ================= -->
+        <!-- =====================================================
+             DASHBOARD
+        ====================================================== -->
 
         <section class="page active" id="dashboard">
 
             <div class="page-header">
 
                 <div>
-                    <h2>Good evening, Trader.</h2>
+                    <h2>Your Trading Dashboard</h2>
                     <p>
-                        Follow the plan. Protect your capital.
+                        Follow your system. Protect your capital.
                     </p>
                 </div>
 
-                <button class="primary" id="quickTrade">
-                    + Log Trade
+                <button class="primary" data-go="trade">
+                    + Start Pre-Trade Check
                 </button>
 
             </div>
 
 
-            <!-- ACCOUNT CARDS -->
-
             <div class="cards">
 
                 <div class="card">
-                    <div class="card-label">
-                        Account Balance
-                    </div>
-
-                    <div class="card-value">
-                        $10,000
-                    </div>
-
-                    <small class="green">
-                        +2.84% this month
-                    </small>
+                    <div class="card-label">Account Balance</div>
+                    <div class="card-value" id="dashBalance">$10,000</div>
+                    <small>Current account</small>
                 </div>
 
-
                 <div class="card">
-                    <div class="card-label">
-                        Today's P/L
-                    </div>
-
-                    <div class="card-value green" id="todayPnl">
-                        +$48
-                    </div>
-
-                    <small>
-                        0.48R
-                    </small>
+                    <div class="card-label">Total P/L</div>
+                    <div class="card-value" id="dashPnl">$0.00</div>
+                    <small id="dashPnlPercent">0.00%</small>
                 </div>
 
-
                 <div class="card">
-                    <div class="card-label">
-                        Trades Today
-                    </div>
-
-                    <div class="card-value">
-                        <span id="tradeCount">2</span> / 3
-                    </div>
-
-                    <small>
-                        Maximum 3 trades
-                    </small>
+                    <div class="card-label">Win Rate</div>
+                    <div class="card-value" id="dashWinRate">0%</div>
+                    <small id="dashTradeCount">0 trades</small>
                 </div>
 
-
                 <div class="card">
-                    <div class="card-label">
-                        Plan Adherence
-                    </div>
-
-                    <div class="card-value green">
-                        <span id="adherence">100</span>%
-                    </div>
-
-                    <small>
-                        This week
-                    </small>
+                    <div class="card-label">Discipline</div>
+                    <div class="card-value green" id="dashDiscipline">100%</div>
+                    <small>Plan adherence</small>
                 </div>
 
             </div>
 
 
-            <!-- EQUITY + GUARDRAILS -->
-
             <div class="two-column">
 
                 <div class="panel">
 
-                    <h3>Equity Curve</h3>
-
-                    <p class="muted">
-                        Account performance
-                    </p>
-
-                    <div class="chart">
-
-                        <div class="chart-bar" style="height:35%"></div>
-                        <div class="chart-bar" style="height:40%"></div>
-                        <div class="chart-bar" style="height:37%"></div>
-                        <div class="chart-bar" style="height:48%"></div>
-                        <div class="chart-bar" style="height:44%"></div>
-                        <div class="chart-bar" style="height:58%"></div>
-                        <div class="chart-bar" style="height:53%"></div>
-                        <div class="chart-bar" style="height:66%"></div>
-                        <div class="chart-bar" style="height:62%"></div>
-                        <div class="chart-bar" style="height:75%"></div>
-                        <div class="chart-bar" style="height:71%"></div>
-                        <div class="chart-bar" style="height:82%"></div>
+                    <div class="panel-heading">
+                        <div>
+                            <h3>Trading Guardrails</h3>
+                            <p class="muted">
+                                Your limits for today
+                            </p>
+                        </div>
                     </div>
 
-                </div>
 
+                    <div class="guard">
 
-                <div class="panel">
+                        <div class="guard-title">
+                            <span>Trades Today</span>
+                            <strong>
+                                <span id="todayTrades">0</span> /
+                                <span id="maxTradesDisplay">3</span>
+                            </strong>
+                        </div>
 
-                    <h3>Risk Guardrails</h3>
+                        <div class="progress">
+                            <div id="tradeProgress" style="width:0%"></div>
+                        </div>
+
+                    </div>
+
 
                     <div class="guard">
 
                         <div class="guard-title">
                             <span>Daily Loss</span>
-                            <strong>$48 / $200</strong>
+                            <strong>
+                                $<span id="todayLoss">0.00</span> /
+                                $<span id="dailyLossDisplay">200</span>
+                            </strong>
                         </div>
 
                         <div class="progress">
-                            <div style="width:24%"></div>
+                            <div id="lossProgress" style="width:0%"></div>
                         </div>
 
                     </div>
@@ -214,53 +192,86 @@
                     <div class="guard">
 
                         <div class="guard-title">
-                            <span>Trades</span>
-                            <strong>2 / 3</strong>
-                        </div>
-
-                        <div class="progress">
-                            <div style="width:67%"></div>
-                        </div>
-
-                    </div>
-
-
-                    <div class="guard">
-
-                        <div class="guard-title">
-                            <span>Daily Risk</span>
-                            <strong>0.48% / 2%</strong>
-                        </div>
-
-                        <div class="progress">
-                            <div style="width:24%"></div>
+                            <span>Risk / Trade</span>
+                            <strong>
+                                <span id="riskDisplay">1</span>%
+                            </strong>
                         </div>
 
                     </div>
 
 
-                    <div class="trade-gate allowed">
+                    <div id="dashboardGate"
+                         class="trade-gate allowed">
 
                         <div class="gate-status">
-                            🟢 TRADE ALLOWED
+                            🟢 TRADING AVAILABLE
                         </div>
 
-                        <small>
-                            You have 1 trade remaining today.
+                        <small id="dashboardGateMessage">
+                            You may begin your pre-trade checklist.
                         </small>
 
                     </div>
 
                 </div>
 
+
+                <div class="panel">
+
+                    <h3>Execution Rules</h3>
+
+                    <div class="rule-list">
+
+                        <div>
+                            <span>01</span>
+                            No checklist = no trade
+                        </div>
+
+                        <div>
+                            <span>02</span>
+                            Risk stays within your limit
+                        </div>
+
+                        <div>
+                            <span>03</span>
+                            Minimum R:R must be respected
+                        </div>
+
+                        <div>
+                            <span>04</span>
+                            No revenge trading
+                        </div>
+
+                        <div>
+                            <span>05</span>
+                            No FOMO entries
+                        </div>
+
+                    </div>
+
+                </div>
+
             </div>
 
 
-            <!-- RECENT TRADES -->
-
             <div class="panel">
 
-                <h3>Recent Trades</h3>
+                <div class="panel-heading">
+
+                    <div>
+                        <h3>Recent Trades</h3>
+                        <p class="muted">
+                            Your latest journal entries
+                        </p>
+                    </div>
+
+                    <button class="secondary" data-go="journal">
+                        View Journal
+                    </button>
+
+                </div>
+
 
                 <div class="table-wrapper">
 
@@ -269,43 +280,24 @@
                         <thead>
 
                             <tr>
+                                <th>Date</th>
                                 <th>Pair</th>
                                 <th>Direction</th>
                                 <th>Setup</th>
                                 <th>Result</th>
                                 <th>R</th>
-                                <th>Date</th>
+                                <th>P/L</th>
                             </tr>
 
                         </thead>
 
-                        <tbody>
+                        <tbody id="recentTrades">
 
                             <tr>
-                                <td>EUR/USD</td>
-                                <td>BUY</td>
-                                <td>Demand + MSS</td>
-                                <td class="green">WIN</td>
-                                <td class="green">+2R</td>
-                                <td>Today</td>
-                            </tr>
-
-                            <tr>
-                                <td>GBP/USD</td>
-                                <td>SELL</td>
-                                <td>Supply + MSS</td>
-                                <td class="green">WIN</td>
-                                <td class="green">+2R</td>
-                                <td>Today</td>
-                            </tr>
-
-                            <tr>
-                                <td>EUR/USD</td>
-                                <td>BUY</td>
-                                <td>Liquidity Sweep</td>
-                                <td class="red">LOSS</td>
-                                <td class="red">-1R</td>
-                                <td>Yesterday</td>
+                                <td colspan="7"
+                                    class="empty">
+                                    No trades recorded yet.
+                                </td>
                             </tr>
 
                         </tbody>
@@ -319,22 +311,187 @@
         </section>
 
 
-        <!-- ================= TRADE PLAN ================= -->
+        <!-- =====================================================
+             MY PLAN
+        ====================================================== -->
 
-        <section class="page" id="tradeplan">
+        <section class="page" id="plan">
 
             <div class="page-header">
 
                 <div>
-                    <h2>Trade Plan</h2>
-
+                    <h2>My Trading Plan</h2>
                     <p>
-                        Complete every requirement before entering a trade.
+                        Your rules are stored on this device.
                     </p>
                 </div>
 
-                <button class="secondary" id="resetPlan">
-                    Reset Checklist
+                <button class="primary" id="savePlan">
+                    Save Plan
+                </button>
+
+            </div>
+
+
+            <div class="panel">
+
+                <div class="section-title">
+                    MARKET CONTEXT
+                </div>
+
+                <div class="form-grid">
+
+                    <div class="field">
+                        <label>Higher Timeframe</label>
+
+                        <select id="planHTF">
+
+                            <option>4H</option>
+                            <option>1H</option>
+                            <option>Daily</option>
+
+                        </select>
+                    </div>
+
+
+                    <div class="field">
+                        <label>Execution Timeframe</label>
+
+                        <select id="planEntryTF">
+
+                            <option>15M</option>
+                            <option>5M</option>
+                            <option>1M</option>
+
+                        </select>
+                    </div>
+
+                </div>
+
+
+                <div class="section-title">
+                    MY SETUP REQUIREMENTS
+                </div>
+
+                <div class="checklist">
+
+                    <label class="check-item">
+                        <input type="checkbox"
+                               class="plan-rule"
+                               data-rule="htf">
+                        HTF market structure supports the trade
+                    </label>
+
+                    <label class="check-item">
+                        <input type="checkbox"
+                               class="plan-rule"
+                               data-rule="zone">
+                        Price is at my planned supply/demand zone
+                    </label>
+
+                    <label class="check-item">
+                        <input type="checkbox"
+                               class="plan-rule"
+                               data-rule="liquidity">
+                        Liquidity / equal highs or lows identified
+                    </label>
+
+                    <label class="check-item">
+                        <input type="checkbox"
+                               class="plan-rule"
+                               data-rule="sweep">
+                        Liquidity sweep occurred
+                    </label>
+
+                    <label class="check-item">
+                        <input type="checkbox"
+                               class="plan-rule"
+                               data-rule="mss">
+                        MSS / BOS confirmation occurred
+                    </label>
+
+                    <label class="check-item">
+                        <input type="checkbox"
+                               class="plan-rule"
+                               data-rule="entry">
+                        Entry has been refined on lower timeframe
+                    </label>
+
+                    <label class="check-item">
+                        <input type="checkbox"
+                               class="plan-rule"
+                               data-rule="rr">
+                        Trade offers my minimum R:R
+                    </label>
+
+                </div>
+
+
+                <div class="section-title">
+                    PSYCHOLOGY
+                </div>
+
+                <div class="checklist">
+
+                    <label class="check-item">
+                        <input type="checkbox"
+                               class="plan-rule"
+                               data-rule="calm">
+                        I am calm and focused
+                    </label>
+
+                    <label class="check-item">
+                        <input type="checkbox"
+                               class="plan-rule"
+                               data-rule="nofomo">
+                        I am not entering because of FOMO
+                    </label>
+
+                    <label class="check-item">
+                        <input type="checkbox"
+                               class="plan-rule"
+                               data-rule="norevenge">
+                        I am not revenge trading
+                    </label>
+
+                </div>
+
+
+                <div class="field full-field">
+
+                    <label>
+                        Personal Rule / Notes
+                    </label>
+
+                    <textarea
+                        id="planNotes"
+                        placeholder="Write your own trading rules here..."></textarea>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             PRE TRADE
+        ====================================================== -->
+
+        <section class="page" id="trade">
+
+            <div class="page-header">
+
+                <div>
+                    <h2>Pre-Trade Checklist</h2>
+
+                    <p>
+                        You cannot execute until your conditions are satisfied.
+                    </p>
+                </div>
+
+                <button class="secondary" id="resetTradeCheck">
+                    Reset
                 </button>
 
             </div>
@@ -345,97 +502,114 @@
                 <div class="panel">
 
                     <div class="section-title">
-                        01 — MARKET CONTEXT
+                        MARKET
                     </div>
 
                     <div class="checklist">
 
                         <label class="check-item">
-                            <input type="checkbox" class="plan-check">
-                            HTF trend identified
+                            <input type="checkbox"
+                                   class="trade-check">
+                            HTF trend/context confirmed
                         </label>
 
                         <label class="check-item">
-                            <input type="checkbox" class="plan-check">
-                            HTF supply / demand zone marked
+                            <input type="checkbox"
+                                   class="trade-check">
+                            Key level / zone marked
                         </label>
 
                         <label class="check-item">
-                            <input type="checkbox" class="plan-check">
-                            Key swing high / low identified
-                        </label>
-
-                        <label class="check-item">
-                            <input type="checkbox" class="plan-check">
-                            Equal highs / lows or liquidity identified
+                            <input type="checkbox"
+                                   class="trade-check">
+                            Liquidity identified
                         </label>
 
                     </div>
 
 
                     <div class="section-title">
-                        02 — SETUP
+                        CONFIRMATION
                     </div>
 
                     <div class="checklist">
 
                         <label class="check-item">
-                            <input type="checkbox" class="plan-check">
-                            Price reached my planned zone
+                            <input type="checkbox"
+                                   class="trade-check">
+                            Price reached my zone
                         </label>
 
                         <label class="check-item">
-                            <input type="checkbox" class="plan-check">
+                            <input type="checkbox"
+                                   class="trade-check">
                             Liquidity sweep confirmed
                         </label>
 
                         <label class="check-item">
-                            <input type="checkbox" class="plan-check">
-                            M15 confirmation received
-                        </label>
-
-                        <label class="check-item">
-                            <input type="checkbox" class="plan-check">
+                            <input type="checkbox"
+                                   class="trade-check">
                             MSS / BOS confirmed
                         </label>
 
                         <label class="check-item">
-                            <input type="checkbox" class="plan-check">
-                            Entry zone refined
+                            <input type="checkbox"
+                                   class="trade-check">
+                            Entry is properly refined
                         </label>
 
                     </div>
 
 
                     <div class="section-title">
-                        03 — RISK
+                        RISK
                     </div>
 
                     <div class="checklist">
 
                         <label class="check-item">
-                            <input type="checkbox" class="plan-check">
-                            Risk is 1% or less
+                            <input type="checkbox"
+                                   class="trade-check">
+                            Risk is within my limit
                         </label>
 
                         <label class="check-item">
-                            <input type="checkbox" class="plan-check">
-                            Risk-to-reward is at least 1:2
+                            <input type="checkbox"
+                                   class="trade-check">
+                            R:R meets my minimum
                         </label>
 
                         <label class="check-item">
-                            <input type="checkbox" class="plan-check">
+                            <input type="checkbox"
+                                   class="trade-check">
                             Stop loss is at invalidation
                         </label>
 
+                    </div>
+
+
+                    <div class="section-title">
+                        PSYCHOLOGY
+                    </div>
+
+                    <div class="checklist">
+
                         <label class="check-item">
-                            <input type="checkbox" class="plan-check">
+                            <input type="checkbox"
+                                   class="trade-check">
                             No FOMO
                         </label>
 
                         <label class="check-item">
-                            <input type="checkbox" class="plan-check">
+                            <input type="checkbox"
+                                   class="trade-check">
                             No revenge trading
+                        </label>
+
+                        <label class="check-item">
+                            <input type="checkbox"
+                                   class="trade-check">
+                            I accept the potential loss
                         </label>
 
                     </div>
@@ -448,37 +622,52 @@
                     <h3>Execution Gate</h3>
 
                     <p class="muted">
-                        You must complete every required condition before
-                        taking the trade.
+                        TradingEdge will evaluate your checklist
+                        before allowing the setup.
                     </p>
 
-                    <div id="tradeGate" class="trade-gate blocked">
+
+                    <div id="executionGate"
+                         class="trade-gate blocked">
 
                         <div class="gate-status">
                             🔴 TRADE BLOCKED
                         </div>
 
-                        <small id="gateMessage">
-                            Complete the checklist.
+                        <small id="executionMessage">
+                            Complete all requirements.
                         </small>
 
                     </div>
 
 
-                    <div class="rule-box">
+                    <div class="trade-summary">
 
-                        <strong>YOUR RULE</strong>
+                        <div>
+                            <span>Checklist</span>
+                            <strong>
+                                <span id="checkCompleted">0</span> /
+                                <span id="checkTotal">0</span>
+                            </strong>
+                        </div>
 
-                        <p>
-                            No checklist = no trade.
-                        </p>
-
-                        <p>
-                            Do not chase price.
-                            Wait for price to reach your planned zone.
-                        </p>
+                        <div>
+                            <span>Status</span>
+                            <strong id="executionPercentage">
+                                0%
+                            </strong>
+                        </div>
 
                     </div>
+
+
+                    <button
+                        class="primary full-button"
+                        id="continueToCalculator">
+
+                        Continue to Risk Calculator
+
+                    </button>
 
                 </div>
 
@@ -487,218 +676,6 @@
         </section>
 
 
-        <!-- ================= RISK CALCULATOR ================= -->
-
-        <section class="page" id="calculator">
-
-            <div class="page-header">
-
-                <div>
-                    <h2>Risk Calculator</h2>
-
-                    <p>
-                        Calculate your risk before entering.
-                    </p>
-                </div>
-
-            </div>
-
-
-            <div class="panel">
-
-                <div class="form-grid">
-
-                    <div class="field">
-                        <label>Account Balance</label>
-                        <input
-                            type="number"
-                            id="balance"
-                            value="10000"
-                        >
-                    </div>
-
-
-                    <div class="field">
-                        <label>Risk %</label>
-                        <input
-                            type="number"
-                            id="riskPercent"
-                            value="1"
-                            step="0.1"
-                        >
-                    </div>
-
-
-                    <div class="field">
-                        <label>Entry Price</label>
-                        <input
-                            type="number"
-                            id="entry"
-                            value="1.16500"
-                            step="0.00001"
-                        >
-                    </div>
-
-
-                    <div class="field">
-                        <label>Stop Loss</label>
-                        <input
-                            type="number"
-                            id="stop"
-                            value="1.16300"
-                            step="0.00001"
-                        >
-                    </div>
-
-
-                    <div class="field">
-                        <label>Take Profit</label>
-                        <input
-                            type="number"
-                            id="target"
-                            value="1.16900"
-                            step="0.00001"
-                        >
-                    </div>
-
-
-                    <div class="field">
-                        <label>Pair</label>
-
-                        <select id="pair">
-
-                            <option>EUR/USD</option>
-                            <option>GBP/USD</option>
-                            <option>USD/JPY</option>
-                            <option>USD/CHF</option>
-                            <option>AUD/USD</option>
-                            <option>NZD/USD</option>
-                            <option>XAU/USD</option>
-
-                        </select>
-
-                    </div>
-
-                </div>
-
-
-                <button class="primary" id="calculateRisk">
-                    Calculate Risk
-                </button>
-
-
-                <div class="risk-result">
-
-                    <div class="result">
-                        <small>Money at Risk</small>
-                        <strong id="moneyRisk">$100</strong>
-                    </div>
-
-                    <div class="result">
-                        <small>Stop Distance</small>
-                        <strong id="stopDistance">20 pips</strong>
-                    </div>
-
-                    <div class="result">
-                        <small>Reward / Risk</small>
-                        <strong id="rewardRisk">2.00R</strong>
-                    </div>
-
-                    <div class="result">
-                        <small>Potential Profit</small>
-                        <strong id="potentialProfit">$200</strong>
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- ================= JOURNAL ================= -->
-
-        <section class="page" id="journal">
-
-            <div class="page-header">
-
-                <div>
-                    <h2>Trade Journal</h2>
-
-                    <p>
-                        Record every trade.
-                    </p>
-
-                </div>
-
-                <button class="primary" id="newTrade">
-                    + New Trade
-                </button>
-
-            </div>
-
-
-            <div class="panel">
-
-                <div class="table-wrapper">
-
-                    <table>
-
-                        <thead>
-
-                            <tr>
-                                <th>Pair</th>
-                                <th>Direction</th>
-                                <th>Setup</th>
-                                <th>Entry</th>
-                                <th>SL</th>
-                                <th>TP</th>
-                                <th>Result</th>
-                                <th>R</th>
-                            </tr>
-
-                        </thead>
-
-                        <tbody id="journalBody">
-
-                            <tr>
-                                <td>EUR/USD</td>
-                                <td>BUY</td>
-                                <td>Demand + MSS</td>
-                                <td>1.1650</td>
-                                <td>1.1630</td>
-                                <td>1.1690</td>
-                                <td class="green">WIN</td>
-                                <td class="green">+2R</td>
-                            </tr>
-
-                            <tr>
-                                <td>GBP/USD</td>
-                                <td>SELL</td>
-                                <td>Supply + MSS</td>
-                                <td>1.3420</td>
-                                <td>1.3440</td>
-                                <td>1.3380</td>
-                                <td class="green">WIN</td>
-                                <td class="green">+2R</td>
-                            </tr>
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- ================= ANALYTICS ================= -->
-
-        <section class="page" id="analytics">
-
-            <div class="page-header">
-
-                <div>
-                    <h2>Ana
+        <!-- =====================================================
+             CALCULATOR
+        ========================================
