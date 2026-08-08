@@ -1,15 +1,15 @@
 /* =========================================================
-   TRADINGEDGE APP ENGINE
+   TRADINGEDGE — PERSONAL TRADING JOURNAL
    ========================================================= */
 
-const STORAGE_KEY = "tradingEdgeData_v1";
+const STORAGE_KEY = "tradingedge_personal_v1";
 
 
 /* =========================================================
    DEFAULT DATA
    ========================================================= */
 
-const defaultData = {
+const DEFAULT_DATA = {
     settings: {
         balance: 10000,
         currency: "USD",
@@ -23,60 +23,75 @@ const defaultData = {
         htf: "4H",
         entryTF: "15M",
         notes: "",
-        rules: {}
+        rules: {
+            context: true,
+            zone: true,
+            liquidity: true,
+            structure: true,
+            risk: true,
+            rr: true
+        }
     },
 
-    trades: [],
-
-    discipline: {
-        totalChecks: 0,
-        completedChecks: 0
-    }
+    trades: []
 };
 
 
+let data = loadData();
+
+
 /* =========================================================
-   DATA STORAGE
+   STORAGE
    ========================================================= */
 
 function loadData() {
 
     try {
 
-        const saved = localStorage.getItem(STORAGE_KEY);
+        const saved =
+            localStorage.getItem(STORAGE_KEY);
 
         if (!saved) {
-            return structuredClone(defaultData);
+            return structuredClone(DEFAULT_DATA);
         }
 
-        const parsed = JSON.parse(saved);
+        const parsed =
+            JSON.parse(saved);
 
         return {
-            ...structuredClone(defaultData),
+
+            ...structuredClone(DEFAULT_DATA),
+
             ...parsed,
+
             settings: {
-                ...defaultData.settings,
+                ...DEFAULT_DATA.settings,
                 ...(parsed.settings || {})
             },
+
             plan: {
-                ...defaultData.plan,
-                ...(parsed.plan || {})
+                ...DEFAULT_DATA.plan,
+                ...(parsed.plan || {}),
+                rules: {
+                    ...DEFAULT_DATA.plan.rules,
+                    ...((parsed.plan || {}).rules || {})
+                }
             },
-            trades: Array.isArray(parsed.trades)
-                ? parsed.trades
-                : []
+
+            trades:
+                Array.isArray(parsed.trades)
+                    ? parsed.trades
+                    : []
+
         };
 
     } catch (error) {
 
-        console.error("Unable to load TradingEdge data:", error);
+        console.error(error);
 
-        return structuredClone(defaultData);
+        return structuredClone(DEFAULT_DATA);
     }
 }
-
-
-let data = loadData();
 
 
 function saveData() {
@@ -86,7 +101,7 @@ function saveData() {
         JSON.stringify(data)
     );
 
-    updateAll();
+    updateEverything();
 }
 
 
@@ -99,9 +114,10 @@ function $(id) {
 }
 
 
-function formatMoney(value) {
+function money(value) {
 
-    const currency = data.settings.currency || "USD";
+    const amount =
+        Number(value) || 0;
 
     try {
 
@@ -109,31 +125,33 @@ function formatMoney(value) {
             undefined,
             {
                 style: "currency",
-                currency: currency,
+                currency: data.settings.currency,
                 maximumFractionDigits: 2
             }
-        ).format(Number(value) || 0);
+        ).format(amount);
 
     } catch {
 
-        return `${currency} ${Number(value || 0).toFixed(2)}`;
+        return `${data.settings.currency} ${amount.toFixed(2)}`;
     }
 }
 
 
-function formatR(value) {
+function setText(id, value) {
 
-    const n = Number(value) || 0;
+    const element = $(id);
 
-    return `${n >= 0 ? "+" : ""}${n.toFixed(2)}R`;
+    if (element) {
+        element.textContent = value;
+    }
 }
 
 
-function todayString() {
+function today() {
 
-    return new Date()
-        .toISOString()
-        .slice(0, 10);
+    const date = new Date();
+
+    return date.toISOString().split("T")[0];
 }
 
 
@@ -144,15 +162,28 @@ function showToast(message) {
     if (!toast) return;
 
     toast.textContent = message;
+
     toast.classList.add("show");
 
-    clearTimeout(window.toastTimer);
+    clearTimeout(window.toastTimeout);
 
-    window.toastTimer = setTimeout(() => {
+    window.toastTimeout =
+        setTimeout(() => {
 
-        toast.classList.remove("show");
+            toast.classList.remove("show");
 
-    }, 2500);
+        }, 2500);
+}
+
+
+function escapeHTML(value) {
+
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
 }
 
 
@@ -160,10 +191,10 @@ function showToast(message) {
    NAVIGATION
    ========================================================= */
 
-const pageTitles = {
+const pageNames = {
     dashboard: "Dashboard",
     plan: "My Plan",
-    trade: "Pre-Trade",
+    checklist: "Pre-Trade",
     calculator: "Risk Calculator",
     journal: "Journal",
     analytics: "Analytics",
@@ -171,32 +202,34 @@ const pageTitles = {
 };
 
 
-function openPage(pageName) {
+function openPage(page) {
 
-    document.querySelectorAll(".page").forEach(page => {
+    document.querySelectorAll(".page")
+        .forEach(section => {
 
-        page.classList.toggle(
-            "active",
-            page.id === pageName
-        );
+            section.classList.toggle(
+                "active",
+                section.id === page
+            );
 
-    });
-
-
-    document.querySelectorAll(".nav-btn").forEach(button => {
-
-        button.classList.toggle(
-            "active",
-            button.dataset.page === pageName
-        );
-
-    });
+        });
 
 
-    if ($("pageTitle")) {
-        $("pageTitle").textContent =
-            pageTitles[pageName] || "TradingEdge";
-    }
+    document.querySelectorAll(".nav-button")
+        .forEach(button => {
+
+            button.classList.toggle(
+                "active",
+                button.dataset.page === page
+            );
+
+        });
+
+
+    setText(
+        "pageTitle",
+        pageNames[page] || "TradingEdge"
+    );
 
 
     const sidebar = $("sidebar");
@@ -213,39 +246,48 @@ function openPage(pageName) {
 }
 
 
-document.querySelectorAll(".nav-btn").forEach(button => {
+document.querySelectorAll(".nav-button")
+    .forEach(button => {
 
-    button.addEventListener("click", () => {
+        button.addEventListener(
+            "click",
+            () => {
 
-        openPage(button.dataset.page);
+                openPage(
+                    button.dataset.page
+                );
 
-    });
-
-});
-
-
-document.querySelectorAll("[data-go]").forEach(button => {
-
-    button.addEventListener("click", () => {
-
-        openPage(button.dataset.go);
+            }
+        );
 
     });
 
-});
 
+document.querySelectorAll("[data-open]")
+    .forEach(button => {
 
-const mobileMenu = $("mobileMenu");
+        button.addEventListener(
+            "click",
+            () => {
 
-if (mobileMenu) {
+                openPage(
+                    button.dataset.open
+                );
 
-    mobileMenu.addEventListener("click", () => {
-
-        $("sidebar").classList.toggle("open");
+            }
+        );
 
     });
 
-}
+
+$("mobileMenu")?.addEventListener(
+    "click",
+    () => {
+
+        $("sidebar")?.classList.toggle("open");
+
+    }
+);
 
 
 /* =========================================================
@@ -254,14 +296,13 @@ if (mobileMenu) {
 
 function updateDate() {
 
-    const element = $("currentDate");
+    const element =
+        $("currentDate");
 
     if (!element) return;
 
-    const date = new Date();
-
     element.textContent =
-        date.toLocaleDateString(
+        new Date().toLocaleDateString(
             undefined,
             {
                 weekday: "long",
@@ -277,149 +318,156 @@ function updateDate() {
    SETTINGS
    ========================================================= */
 
-function loadSettingsIntoUI() {
+function loadSettings() {
 
-    const s = data.settings;
+    const s =
+        data.settings;
+
 
     if ($("settingBalance"))
-        $("settingBalance").value = s.balance;
+        $("settingBalance").value =
+            s.balance;
 
     if ($("settingCurrency"))
-        $("settingCurrency").value = s.currency;
+        $("settingCurrency").value =
+            s.currency;
 
     if ($("settingRisk"))
-        $("settingRisk").value = s.risk;
+        $("settingRisk").value =
+            s.risk;
 
     if ($("settingMaxTrades"))
-        $("settingMaxTrades").value = s.maxTrades;
+        $("settingMaxTrades").value =
+            s.maxTrades;
 
     if ($("settingDailyLoss"))
-        $("settingDailyLoss").value = s.dailyLoss;
+        $("settingDailyLoss").value =
+            s.dailyLoss;
 
     if ($("settingMinRR"))
-        $("settingMinRR").value = s.minRR;
+        $("settingMinRR").value =
+            s.minRR;
 
 
     if ($("calcBalance"))
-        $("calcBalance").value = s.balance;
+        $("calcBalance").value =
+            s.balance;
 
     if ($("calcRisk"))
-        $("calcRisk").value = s.risk;
+        $("calcRisk").value =
+            s.risk;
 }
 
 
-function saveSettings() {
+$("saveSettings")
+    ?.addEventListener(
+        "click",
+        () => {
 
-    const balance =
-        Number($("settingBalance").value);
+            const balance =
+                Number(
+                    $("settingBalance").value
+                );
 
-    const risk =
-        Number($("settingRisk").value);
+            const risk =
+                Number(
+                    $("settingRisk").value
+                );
 
-    const maxTrades =
-        Number($("settingMaxTrades").value);
+            const maxTrades =
+                Number(
+                    $("settingMaxTrades").value
+                );
 
-    const dailyLoss =
-        Number($("settingDailyLoss").value);
+            const dailyLoss =
+                Number(
+                    $("settingDailyLoss").value
+                );
 
-    const minRR =
-        Number($("settingMinRR").value);
-
-    if (
-        !Number.isFinite(balance) ||
-        balance <= 0
-    ) {
-
-        showToast("Enter a valid account balance.");
-
-        return;
-    }
-
-
-    if (
-        !Number.isFinite(risk) ||
-        risk <= 0
-    ) {
-
-        showToast("Enter a valid risk percentage.");
-
-        return;
-    }
+            const minRR =
+                Number(
+                    $("settingMinRR").value
+                );
 
 
-    if (
-        !Number.isFinite(maxTrades) ||
-        maxTrades < 1
-    ) {
+            if (
+                !Number.isFinite(balance) ||
+                balance <= 0
+            ) {
 
-        showToast("Maximum trades must be at least 1.");
+                showToast(
+                    "Enter a valid balance."
+                );
 
-        return;
-    }
-
-
-    if (
-        !Number.isFinite(dailyLoss) ||
-        dailyLoss < 0
-    ) {
-
-        showToast("Enter a valid daily loss limit.");
-
-        return;
-    }
+                return;
+            }
 
 
-    if (
-        !Number.isFinite(minRR) ||
-        minRR < 0
-    ) {
+            if (
+                !Number.isFinite(risk) ||
+                risk <= 0
+            ) {
 
-        showToast("Enter a valid minimum R:R.");
+                showToast(
+                    "Enter a valid risk percentage."
+                );
 
-        return;
-    }
-
-
-    data.settings = {
-
-        balance,
-        currency: $("settingCurrency").value,
-        risk,
-        maxTrades,
-        dailyLoss,
-        minRR
-
-    };
+                return;
+            }
 
 
-    saveData();
+            data.settings = {
 
-    showToast("Trading rules saved.");
-}
+                balance,
+
+                currency:
+                    $("settingCurrency").value,
+
+                risk,
+
+                maxTrades:
+                    Math.max(1, maxTrades),
+
+                dailyLoss:
+                    Math.max(0, dailyLoss),
+
+                minRR:
+                    Math.max(0, minRR)
+
+            };
 
 
-$("saveSettings")?.addEventListener(
-    "click",
-    saveSettings
-);
+            saveData();
+
+            showToast(
+                "Settings saved."
+            );
+
+        }
+    );
 
 
 /* =========================================================
-   PLAN
+   TRADING PLAN
    ========================================================= */
 
-function loadPlanIntoUI() {
+function loadPlan() {
 
-    const p = data.plan;
+    const plan =
+        data.plan;
+
 
     if ($("planHTF"))
-        $("planHTF").value = p.htf;
+        $("planHTF").value =
+            plan.htf;
 
     if ($("planEntryTF"))
-        $("planEntryTF").value = p.entryTF;
+        $("planEntryTF").value =
+            plan.entryTF;
 
     if ($("planNotes"))
-        $("planNotes").value = p.notes || "";
+        $("planNotes").value =
+            plan.notes || "";
 
 
     document.querySelectorAll(".plan-rule")
@@ -427,230 +475,100 @@ function loadPlanIntoUI() {
 
             input.checked =
                 Boolean(
-                    p.rules[input.dataset.rule]
+                    plan.rules[
+                        input.dataset.rule
+                    ]
                 );
 
         });
 }
 
 
-function savePlan() {
+$("savePlan")
+    ?.addEventListener(
+        "click",
+        () => {
 
-    const rules = {};
+            const rules = {};
 
-    document.querySelectorAll(".plan-rule")
-        .forEach(input => {
+            document.querySelectorAll(".plan-rule")
+                .forEach(input => {
 
-            rules[input.dataset.rule] =
-                input.checked;
+                    rules[
+                        input.dataset.rule
+                    ] = input.checked;
 
-        });
-
-
-    data.plan = {
-
-        htf: $("planHTF").value,
-
-        entryTF:
-            $("planEntryTF").value,
-
-        notes:
-            $("planNotes").value.trim(),
-
-        rules
-
-    };
+                });
 
 
-    saveData();
+            data.plan = {
 
-    showToast("Trading plan saved.");
-}
+                htf:
+                    $("planHTF").value,
 
+                entryTF:
+                    $("planEntryTF").value,
 
-$("savePlan")?.addEventListener(
-    "click",
-    savePlan
-);
+                notes:
+                    $("planNotes").value.trim(),
 
+                rules
 
-/* =========================================================
-   PRE-TRADE CHECKLIST
-   ========================================================= */
-
-function updateTradeChecklist() {
-
-    const checks =
-        document.querySelectorAll(".trade-check");
-
-    const completed =
-        document.querySelectorAll(
-            ".trade-check:checked"
-        ).length;
-
-    const total = checks.length;
-
-    const percentage =
-        total === 0
-            ? 0
-            : Math.round(
-                (completed / total) * 100
-            );
+            };
 
 
-    if ($("checkCompleted"))
-        $("checkCompleted").textContent =
-            completed;
-
-    if ($("checkTotal"))
-        $("checkTotal").textContent =
-            total;
-
-    if ($("executionPercentage"))
-        $("executionPercentage").textContent =
-            `${percentage}%`;
-
-
-    const gate =
-        $("executionGate");
-
-    const message =
-        $("executionMessage");
-
-
-    if (!gate) return;
-
-
-    if (completed === total && total > 0) {
-
-        gate.className =
-            "trade-gate allowed";
-
-        gate.querySelector(".gate-status")
-            .textContent =
-            "🟢 TRADE ALLOWED";
-
-        message.textContent =
-            "All pre-trade conditions are satisfied.";
-
-    } else {
-
-        gate.className =
-            "trade-gate blocked";
-
-        gate.querySelector(".gate-status")
-            .textContent =
-            "🔴 TRADE BLOCKED";
-
-        message.textContent =
-            `${total - completed} requirement(s) remaining.`;
-
-    }
-}
-
-
-document.querySelectorAll(".trade-check")
-    .forEach(input => {
-
-        input.addEventListener(
-            "change",
-            updateTradeChecklist
-        );
-
-    });
-
-
-$("resetTradeCheck")?.addEventListener(
-    "click",
-    () => {
-
-        document.querySelectorAll(".trade-check")
-            .forEach(input => {
-
-                input.checked = false;
-
-            });
-
-        updateTradeChecklist();
-
-        showToast("Checklist reset.");
-
-    }
-);
-
-
-$("continueToCalculator")
-    ?.addEventListener("click", () => {
-
-        const checks =
-            document.querySelectorAll(".trade-check");
-
-        const completed =
-            document.querySelectorAll(
-                ".trade-check:checked"
-            ).length;
-
-        if (
-            completed !== checks.length
-        ) {
+            saveData();
 
             showToast(
-                "Complete the checklist before continuing."
+                "Trading plan saved."
             );
 
-            return;
         }
-
-        openPage("calculator");
-
-    });
+    );
 
 
 /* =========================================================
-   DAILY STATS
+   DAILY TRADING LIMITS
    ========================================================= */
 
-function getTodayTrades() {
-
-    const today = todayString();
+function todaysTrades() {
 
     return data.trades.filter(
         trade =>
-            trade.date === today
+            trade.date === today()
     );
 }
 
 
-function getTodayLoss() {
+function todaysLoss() {
 
-    return getTodayTrades()
-        .filter(trade =>
-            Number(trade.pl) < 0
+    return todaysTrades()
+        .filter(
+            trade =>
+                Number(trade.pl) < 0
         )
         .reduce(
             (sum, trade) =>
-                sum + Math.abs(Number(trade.pl) || 0),
+                sum +
+                Math.abs(
+                    Number(trade.pl) || 0
+                ),
             0
         );
 }
 
 
-/* =========================================================
-   DASHBOARD
-   ========================================================= */
-
 function updateDashboard() {
 
-    const trades = data.trades;
-
-    const balance =
-        Number(data.settings.balance) || 0;
+    const trades =
+        data.trades;
 
 
-    const pnl =
+    const totalPL =
         trades.reduce(
             (sum, trade) =>
-                sum + (Number(trade.pl) || 0),
+                sum +
+                (Number(trade.pl) || 0),
             0
         );
 
@@ -664,169 +582,732 @@ function updateDashboard() {
 
     const winRate =
         trades.length
-            ? Math.round(
-                (wins / trades.length) * 100
-            )
+            ? (wins / trades.length) * 100
             : 0;
 
 
-    const todayTrades =
-        getTodayTrades().length;
+    const todayCount =
+        todaysTrades().length;
 
 
-    const todayLoss =
-        getTodayLoss();
+    const loss =
+        todaysLoss();
 
 
     const maxTrades =
-        Number(data.settings.maxTrades) || 1;
+        Number(
+            data.settings.maxTrades
+        ) || 1;
 
 
     const dailyLoss =
-        Number(data.settings.dailyLoss) || 0;
-
-
-    const tradePercentage =
-        Math.min(
-            100,
-            (todayTrades / maxTrades) * 100
-        );
-
-
-    const lossPercentage =
-        dailyLoss > 0
-            ? Math.min(
-                100,
-                (todayLoss / dailyLoss) * 100
-            )
-            : 0;
-
-
-    const discipline =
-        calculateDiscipline();
+        Number(
+            data.settings.dailyLoss
+        ) || 0;
 
 
     setText(
         "dashBalance",
-        formatMoney(balance)
+        money(data.settings.balance)
     );
+
 
     setText(
         "dashPnl",
-        formatMoney(pnl)
+        money(totalPL)
     );
+
+
+    const pnlPercent =
+        data.settings.balance
+            ? (
+                totalPL /
+                data.settings.balance *
+                100
+            )
+            : 0;
+
 
     setText(
         "dashPnlPercent",
-        balance
-            ? `${((pnl / balance) * 100).toFixed(2)}%`
-            : "0.00%"
+        `${pnlPercent.toFixed(2)}%`
     );
+
 
     setText(
         "dashWinRate",
-        `${winRate}%`
+        `${winRate.toFixed(1)}%`
     );
+
 
     setText(
         "dashTradeCount",
         `${trades.length} trades`
     );
 
-    setText(
-        "dashDiscipline",
-        `${discipline}%`
-    );
-
-    setText(
-        "sideDiscipline",
-        `${discipline}%`
-    );
 
     setText(
         "todayTrades",
-        todayTrades
+        todayCount
     );
 
+
     setText(
-        "maxTradesDisplay",
+        "maxTrades",
         maxTrades
     );
 
-    setText(
-        "todayLoss",
-        todayLoss.toFixed(2)
-    );
 
     setText(
-        "dailyLossDisplay",
+        "todayLoss",
+        loss.toFixed(2)
+    );
+
+
+    setText(
+        "dailyLossLimit",
         dailyLoss.toFixed(2)
     );
 
-    setText(
-        "riskDisplay",
-        data.settings.risk
-    );
+
+    const tradePercent =
+        Math.min(
+            100,
+            todayCount /
+            maxTrades *
+            100
+        );
+
+
+    const lossPercent =
+        dailyLoss > 0
+            ? Math.min(
+                100,
+                loss /
+                dailyLoss *
+                100
+            )
+            : 0;
 
 
     if ($("tradeProgress"))
         $("tradeProgress").style.width =
-            `${tradePercentage}%`;
+            `${tradePercent}%`;
+
 
     if ($("lossProgress"))
         $("lossProgress").style.width =
-            `${lossPercentage}%`;
+            `${lossPercent}%`;
+
+
+    const locked =
+        todayCount >= maxTrades ||
+        (
+            dailyLoss > 0 &&
+            loss >= dailyLoss
+        );
 
 
     const gate =
         $("dashboardGate");
 
-    const gateMessage =
-        $("dashboardGateMessage");
+
+    if (gate) {
+
+        if (locked) {
+
+            gate.className =
+                "trade-gate blocked";
+
+            setText(
+                "dashboardGateTitle",
+                "🔴 TRADING LOCKED"
+            );
 
 
-    const blockedByTrades =
-        todayTrades >= maxTrades;
+            setText(
+                "dashboardGateMessage",
 
-    const blockedByLoss =
-        dailyLoss > 0 &&
-        todayLoss >= dailyLoss;
+                todayCount >= maxTrades
+                    ? "Daily trade limit reached."
+                    : "Daily loss limit reached."
+            );
+
+        } else {
+
+            gate.className =
+                "trade-gate allowed";
+
+            setText(
+                "dashboardGateTitle",
+                "🟢 TRADING AVAILABLE"
+            );
 
 
-    if (
-        blockedByTrades ||
-        blockedByLoss
-    ) {
+            setText(
+                "dashboardGateMessage",
+                "You may begin your pre-trade checklist."
+            );
 
-        gate.className =
-            "trade-gate blocked";
-
-        gate.querySelector(".gate-status")
-            .textContent =
-            "🔴 TRADING LOCKED";
-
-        gateMessage.textContent =
-            blockedByTrades
-                ? "Daily trade limit reached."
-                : "Daily loss limit reached.";
-
-    } else {
-
-        gate.className =
-            "trade-gate allowed";
-
-        gate.querySelector(".gate-status")
-            .textContent =
-            "🟢 TRADING AVAILABLE";
-
-        gateMessage.textContent =
-            "You may begin your pre-trade checklist.";
+        }
 
     }
 
 
     renderRecentTrades();
 }
+
+
+/* =========================================================
+   CHECKLIST
+   ========================================================= */
+
+function updateChecklist() {
+
+    const checks =
+        document.querySelectorAll(
+            ".trade-check"
+        );
+
+
+    const completed =
+        document.querySelectorAll(
+            ".trade-check:checked"
+        ).length;
+
+
+    const total =
+        checks.length;
+
+
+    const percent =
+        total
+            ? Math.round(
+                completed /
+                total *
+                100
+            )
+            : 0;
+
+
+    setText(
+        "checksDone",
+        completed
+    );
+
+
+    setText(
+        "checksTotal",
+        total
+    );
+
+
+    setText(
+        "checkPercent",
+        `${percent}%`
+    );
+
+
+    if ($("checkProgress"))
+        $("checkProgress").style.width =
+            `${percent}%`;
+
+
+    const gate =
+        $("executionGate");
+
+
+    if (!gate) return;
+
+
+    if (
+        completed === total &&
+        total > 0
+    ) {
+
+        gate.className =
+            "trade-gate allowed";
+
+        setText(
+            "executionGateTitle",
+            "🟢 TRADE ALLOWED"
+        );
+
+        setText(
+            "executionMessage",
+            "All checklist conditions are satisfied."
+        );
+
+    } else {
+
+        gate.className =
+            "trade-gate blocked";
+
+        setText(
+            "executionGateTitle",
+            "🔴 TRADE BLOCKED"
+        );
+
+        setText(
+            "executionMessage",
+            `${total - completed} requirement(s) remaining.`
+        );
+
+    }
+
+}
+
+
+document.querySelectorAll(".trade-check")
+    .forEach(check => {
+
+        check.addEventListener(
+            "change",
+            updateChecklist
+        );
+
+    });
+
+
+$("resetChecklist")
+    ?.addEventListener(
+        "click",
+        () => {
+
+            document.querySelectorAll(".trade-check")
+                .forEach(check => {
+
+                    check.checked = false;
+
+                });
+
+
+            updateChecklist();
+
+            showToast(
+                "Checklist reset."
+            );
+
+        }
+    );
+
+
+$("goCalculator")
+    ?.addEventListener(
+        "click",
+        () => {
+
+            const checks =
+                document.querySelectorAll(
+                    ".trade-check"
+                );
+
+
+            const completed =
+                document.querySelectorAll(
+                    ".trade-check:checked"
+                ).length;
+
+
+            if (
+                completed !== checks.length
+            ) {
+
+                showToast(
+                    "Complete the checklist first."
+                );
+
+                return;
+            }
+
+
+            openPage("calculator");
+
+        }
+    );
+
+
+/* =========================================================
+   RISK CALCULATOR
+   ========================================================= */
+
+$("calculateRisk")
+    ?.addEventListener(
+        "click",
+        calculateRisk
+    );
+
+
+function calculateRisk() {
+
+    const balance =
+        Number(
+            $("calcBalance").value
+        );
+
+
+    const riskPercent =
+        Number(
+            $("calcRisk").value
+        );
+
+
+    const entry =
+        Number(
+            $("calcEntry").value
+        );
+
+
+    const stop =
+        Number(
+            $("calcStop").value
+        );
+
+
+    const target =
+        Number(
+            $("calcTarget").value
+        );
+
+
+    if (
+        !Number.isFinite(balance) ||
+        balance <= 0
+    ) {
+
+        showToast(
+            "Enter a valid account balance."
+        );
+
+        return;
+    }
+
+
+    if (
+        !Number.isFinite(riskPercent) ||
+        riskPercent <= 0
+    ) {
+
+        showToast(
+            "Enter a valid risk percentage."
+        );
+
+        return;
+    }
+
+
+    const riskMoney =
+        balance *
+        riskPercent /
+        100;
+
+
+    let stopDistance = 0;
+    let targetDistance = 0;
+
+
+    if (
+        Number.isFinite(entry) &&
+        Number.isFinite(stop)
+    ) {
+
+        stopDistance =
+            Math.abs(
+                entry - stop
+            );
+
+    }
+
+
+    if (
+        Number.isFinite(entry) &&
+        Number.isFinite(target)
+    ) {
+
+        targetDistance =
+            Math.abs(
+                target - entry
+            );
+
+    }
+
+
+    let rr = 0;
+
+
+    if (stopDistance > 0) {
+
+        rr =
+            targetDistance /
+            stopDistance;
+
+    }
+
+
+    const pair =
+        (
+            $("calcPair").value ||
+            "EURUSD"
+        )
+        .toUpperCase();
+
+
+    const pipSize =
+        pair.includes("JPY")
+            ? 0.01
+            : 0.0001;
+
+
+    const pips =
+        stopDistance > 0
+            ? stopDistance /
+              pipSize
+            : 0;
+
+
+    /*
+       Simplified estimate.
+
+       Actual lot sizing depends on
+       instrument specifications,
+       contract size, pip value and
+       account currency.
+    */
+
+    const lots =
+        pips > 0
+            ? riskMoney /
+              (pips * 10)
+            : 0;
+
+
+    const potentialProfit =
+        riskMoney * rr;
+
+
+    setText(
+        "resultRisk",
+        money(riskMoney)
+    );
+
+
+    setText(
+        "resultPips",
+        `${pips.toFixed(1)} pips`
+    );
+
+
+    setText(
+        "resultRR",
+        `${rr.toFixed(2)}R`
+    );
+
+
+    setText(
+        "resultProfit",
+        money(potentialProfit)
+    );
+
+
+    setText(
+        "resultLots",
+        lots.toFixed(2)
+    );
+
+
+    const status =
+        $("resultStatus");
+
+
+    if (status) {
+
+        if (
+            rr >=
+            Number(data.settings.minRR)
+        ) {
+
+            status.textContent =
+                "VALID";
+
+            status.className =
+                "green";
+
+        } else {
+
+            status.textContent =
+                "BELOW MIN R:R";
+
+            status.className =
+                "red";
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   JOURNAL MODAL
+   ========================================================= */
+
+$("addTrade")
+    ?.addEventListener(
+        "click",
+        () => {
+
+            $("tradeModal")
+                ?.classList.add("open");
+
+        }
+    );
+
+
+$("closeModal")
+    ?.addEventListener(
+        "click",
+        closeModal
+    );
+
+
+$("cancelTrade")
+    ?.addEventListener(
+        "click",
+        closeModal
+    );
+
+
+$("tradeModal")
+    ?.addEventListener(
+        "click",
+        event => {
+
+            if (
+                event.target ===
+                $("tradeModal")
+            ) {
+
+                closeModal();
+
+            }
+
+        }
+    );
+
+
+function closeModal() {
+
+    $("tradeModal")
+        ?.classList.remove("open");
+
+}
+
+
+/* =========================================================
+   ADD TRADE
+   ========================================================= */
+
+$("tradeForm")
+    ?.addEventListener(
+        "submit",
+        event => {
+
+            event.preventDefault();
+
+
+            const pair =
+                $("tradePair").value
+                    .trim()
+                    .toUpperCase();
+
+
+            const setup =
+                $("tradeSetup").value
+                    .trim();
+
+
+            const r =
+                Number(
+                    $("tradeR").value
+                );
+
+
+            const pl =
+                Number(
+                    $("tradePL").value
+                );
+
+
+            if (!pair || !setup) {
+
+                showToast(
+                    "Complete the required fields."
+                );
+
+                return;
+            }
+
+
+            if (
+                !Number.isFinite(r) ||
+                !Number.isFinite(pl)
+            ) {
+
+                showToast(
+                    "Enter valid R and P/L values."
+                );
+
+                return;
+            }
+
+
+            const trade = {
+
+                id:
+                    Date.now().toString(),
+
+                date:
+                    today(),
+
+                pair,
+
+                direction:
+                    $("tradeDirection").value,
+
+                setup,
+
+                result:
+                    $("tradeResult").value,
+
+                r,
+
+                pl,
+
+                notes:
+                    $("tradeNotes").value.trim()
+
+            };
+
+
+            data.trades.push(
+                trade
+            );
+
+
+            saveData();
+
+
+            $("tradeForm").reset();
+
+            closeModal();
+
+
+            showToast(
+                "Trade added."
+            );
+
+        }
+    );
 
 
 /* =========================================================
@@ -837,6 +1318,7 @@ function renderRecentTrades() {
 
     const body =
         $("recentTrades");
+
 
     if (!body) return;
 
@@ -862,50 +1344,60 @@ function renderRecentTrades() {
 
 
     body.innerHTML =
-        trades.map(trade => {
+        trades.map(
+            trade => {
 
-            const resultClass =
-                trade.result === "WIN"
-                    ? "green"
-                    : trade.result === "LOSS"
-                        ? "red"
-                        : "yellow";
+                const r =
+                    Number(trade.r) || 0;
 
-
-            const r =
-                Number(trade.r) || 0;
-
-            const pl =
-                Number(trade.pl) || 0;
+                const pl =
+                    Number(trade.pl) || 0;
 
 
-            return `
-                <tr>
+                const resultClass =
+                    trade.result === "WIN"
+                        ? "green"
+                        : trade.result === "LOSS"
+                            ? "red"
+                            : "yellow";
 
-                    <td>${escapeHTML(trade.date)}</td>
 
-                    <td>${escapeHTML(trade.pair)}</td>
+                return `
+                    <tr>
 
-                    <td>${escapeHTML(trade.direction)}</td>
+                        <td>
+                            ${escapeHTML(trade.date)}
+                        </td>
 
-                    <td>${escapeHTML(trade.setup)}</td>
+                        <td>
+                            ${escapeHTML(trade.pair)}
+                        </td>
 
-                    <td class="${resultClass}">
-                        ${escapeHTML(trade.result)}
-                    </td>
+                        <td>
+                            ${escapeHTML(trade.direction)}
+                        </td>
 
-                    <td class="${r >= 0 ? "green" : "red"}">
-                        ${formatR(r)}
-                    </td>
+                        <td>
+                            ${escapeHTML(trade.setup)}
+                        </td>
 
-                    <td class="${pl >= 0 ? "green" : "red"}">
-                        ${formatMoney(pl)}
-                    </td>
+                        <td class="${resultClass}">
+                            ${escapeHTML(trade.result)}
+                        </td>
 
-                </tr>
-            `;
+                        <td class="${r >= 0 ? "green" : "red"}">
+                            ${r >= 0 ? "+" : ""}${r.toFixed(2)}R
+                        </td>
 
-        }).join("");
+                        <td class="${pl >= 0 ? "green" : "red"}">
+                            ${money(pl)}
+                        </td>
+
+                    </tr>
+                `;
+
+            }
+        ).join("");
 }
 
 
@@ -913,145 +1405,11 @@ function renderRecentTrades() {
    JOURNAL
    ========================================================= */
 
-function openTradeModal() {
-
-    $("tradeModal")
-        ?.classList.add("open");
-
-}
-
-
-function closeTradeModal() {
-
-    $("tradeModal")
-        ?.classList.remove("open");
-
-}
-
-
-$("openTradeModal")
-    ?.addEventListener(
-        "click",
-        openTradeModal
-    );
-
-
-$("closeTradeModal")
-    ?.addEventListener(
-        "click",
-        closeTradeModal
-    );
-
-
-$("cancelTrade")
-    ?.addEventListener(
-        "click",
-        closeTradeModal
-    );
-
-
-$("tradeModal")
-    ?.addEventListener(
-        "click",
-        event => {
-
-            if (
-                event.target ===
-                $("tradeModal")
-            ) {
-
-                closeTradeModal();
-
-            }
-
-        }
-    );
-
-
-$("tradeForm")
-    ?.addEventListener(
-        "submit",
-        event => {
-
-            event.preventDefault();
-
-
-            const trade = {
-
-                id:
-                    Date.now().toString(),
-
-                date:
-                    todayString(),
-
-                pair:
-                    $("tradePair").value
-                        .trim()
-                        .toUpperCase(),
-
-                direction:
-                    $("tradeDirection").value,
-
-                setup:
-                    $("tradeSetup").value
-                        .trim(),
-
-                result:
-                    $("tradeResult").value,
-
-                r:
-                    Number($("tradeR").value),
-
-                pl:
-                    Number($("tradePL").value),
-
-                notes:
-                    $("tradeNotes").value.trim()
-
-            };
-
-
-            if (!trade.pair || !trade.setup) {
-
-                showToast(
-                    "Complete the required fields."
-                );
-
-                return;
-            }
-
-
-            if (
-                !Number.isFinite(trade.r) ||
-                !Number.isFinite(trade.pl)
-            ) {
-
-                showToast(
-                    "Enter valid R and P/L values."
-                );
-
-                return;
-            }
-
-
-            data.trades.push(trade);
-
-            saveData();
-
-            $("tradeForm").reset();
-
-            closeTradeModal();
-
-            showToast("Trade added to journal.");
-
-        }
-    );
-
-
 function renderJournal() {
 
     const body =
         $("journalBody");
+
 
     if (!body) return;
 
@@ -1066,46 +1424,594 @@ function renderJournal() {
         body.innerHTML = `
             <tr>
                 <td colspan="8" class="empty">
-                    No trades yet. Start your journal.
+                    No trades yet.
                 </td>
             </tr>
         `;
+
+        updateJournalStats();
 
         return;
     }
 
 
     body.innerHTML =
-        trades.map(trade => {
+        trades.map(
+            trade => {
 
-            const r =
-                Number(trade.r) || 0;
+                const r =
+                    Number(trade.r) || 0;
 
-            const pl =
-                Number(trade.pl) || 0;
+                const pl =
+                    Number(trade.pl) || 0;
 
 
-            const resultClass =
+                const resultClass =
+                    trade.result === "WIN"
+                        ? "green"
+                        : trade.result === "LOSS"
+                            ? "red"
+                            : "yellow";
+
+
+                return `
+                    <tr>
+
+                        <td>
+                            ${escapeHTML(trade.date)}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(trade.pair)}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(trade.direction)}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(trade.setup)}
+                        </td>
+
+                        <td class="${resultClass}">
+                            ${escapeHTML(trade.result)}
+                        </td>
+
+                        <td class="${r >= 0 ? "green" : "red"}">
+                            ${r >= 0 ? "+" : ""}${r.toFixed(2)}R
+                        </td>
+
+                        <td class="${pl >= 0 ? "green" : "red"}">
+                            ${money(pl)}
+                        </td>
+
+                        <td>
+                            <button
+                                class="table-action delete"
+                                data-delete="${trade.id}">
+                                Delete
+                            </button>
+                        </td>
+
+                    </tr>
+                `;
+
+            }
+        ).join("");
+
+
+    document.querySelectorAll(
+        "[data-delete]"
+    ).forEach(button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                deleteTrade(
+                    button.dataset.delete
+                );
+
+            }
+        );
+
+    });
+
+
+    updateJournalStats();
+}
+
+
+function updateJournalStats() {
+
+    const trades =
+        data.trades;
+
+
+    const wins =
+        trades.filter(
+            trade =>
                 trade.result === "WIN"
-                    ? "green"
-                    : trade.result === "LOSS"
-                        ? "red"
-                        : "yellow";
+        ).length;
 
 
-            return `
-                <tr>
+    const losses =
+        trades.filter(
+            trade =>
+                trade.result === "LOSS"
+        ).length;
 
-                    <td>${escapeHTML(trade.date)}</td>
 
-                    <td>${escapeHTML(trade.pair)}</td>
+    const netR =
+        trades.reduce(
+            (sum, trade) =>
+                sum +
+                (Number(trade.r) || 0),
+            0
+        );
 
-                    <td>${escapeHTML(trade.direction)}</td>
 
-                    <td>${escapeHTML(trade.setup)}</td>
+    setText(
+        "journalTotal",
+        trades.length
+    );
 
-                    <td class="${resultClass}">
-                        ${escapeHTML(trade.result)}
-                    </td>
 
-                    <td class="${r >= 0
+    setText(
+        "journalWins",
+        wins
+    );
+
+
+    setText(
+        "journalLosses",
+        losses
+    );
+
+
+    setText(
+        "journalNetR",
+        `${netR >= 0 ? "+" : ""}${netR.toFixed(2)}R`
+    );
+}
+
+
+function deleteTrade(id) {
+
+    const trade =
+        data.trades.find(
+            item =>
+                item.id === id
+        );
+
+
+    if (!trade) return;
+
+
+    if (
+        !confirm(
+            `Delete ${trade.pair} trade?`
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    data.trades =
+        data.trades.filter(
+            item =>
+                item.id !== id
+        );
+
+
+    saveData();
+
+    showToast(
+        "Trade deleted."
+    );
+}
+
+
+/* =========================================================
+   ANALYTICS
+   ========================================================= */
+
+function updateAnalytics() {
+
+    const trades =
+        data.trades;
+
+
+    const wins =
+        trades.filter(
+            trade =>
+                trade.result === "WIN"
+        );
+
+
+    const losses =
+        trades.filter(
+            trade =>
+                trade.result === "LOSS"
+        );
+
+
+    const winRate =
+        trades.length
+            ? wins.length /
+              trades.length *
+              100
+            : 0;
+
+
+    const netR =
+        trades.reduce(
+            (sum, trade) =>
+                sum +
+                (Number(trade.r) || 0),
+            0
+        );
+
+
+    const averageR =
+        trades.length
+            ? netR /
+              trades.length
+            : 0;
+
+
+    const grossProfit =
+        wins.reduce(
+            (sum, trade) =>
+                sum +
+                Math.max(
+                    0,
+                    Number(trade.pl) || 0
+                ),
+            0
+        );
+
+
+    const grossLoss =
+        losses.reduce(
+            (sum, trade) =>
+                sum +
+                Math.abs(
+                    Math.min(
+                        0,
+                        Number(trade.pl) || 0
+                    )
+                ),
+            0
+        );
+
+
+    const profitFactor =
+        grossLoss > 0
+            ? grossProfit /
+              grossLoss
+            : grossProfit > 0
+                ? Infinity
+                : 0;
+
+
+    setText(
+        "analyticsWinRate",
+        `${winRate.toFixed(1)}%`
+    );
+
+
+    setText(
+        "analyticsAvgR",
+        `${averageR >= 0 ? "+" : ""}${averageR.toFixed(2)}R`
+    );
+
+
+    setText(
+        "analyticsPF",
+        Number.isFinite(profitFactor)
+            ? profitFactor.toFixed(2)
+            : "∞"
+    );
+
+
+    setText(
+        "analyticsNetR",
+        `${netR >= 0 ? "+" : ""}${netR.toFixed(2)}R`
+    );
+
+
+    setText(
+        "metricWinRate",
+        `${winRate.toFixed(1)}%`
+    );
+
+
+    if ($("winRateBar"))
+        $("winRateBar").style.width =
+            `${Math.min(100, winRate)}%`;
+
+
+    setText(
+        "metricDiscipline",
+        "100%"
+    );
+
+
+    if ($("disciplineBar"))
+        $("disciplineBar").style.width =
+            "100%";
+}
+
+
+/* =========================================================
+   EXPORT
+   ========================================================= */
+
+$("exportData")
+    ?.addEventListener(
+        "click",
+        () => {
+
+            const backup = {
+
+                application:
+                    "TradingEdge",
+
+                version:
+                    1,
+
+                exportedAt:
+                    new Date().toISOString(),
+
+                data
+
+            };
+
+
+            const blob =
+                new Blob(
+                    [
+                        JSON.stringify(
+                            backup,
+                            null,
+                            2
+                        )
+                    ],
+                    {
+                        type:
+                            "application/json"
+                    }
+                );
+
+
+            const url =
+                URL.createObjectURL(
+                    blob
+                );
+
+
+            const link =
+                document.createElement("a");
+
+
+            link.href = url;
+
+            link.download =
+                `tradingedge-backup-${today()}.json`;
+
+
+            document.body.appendChild(link);
+
+            link.click();
+
+            link.remove();
+
+            URL.revokeObjectURL(url);
+
+
+            showToast(
+                "Backup exported."
+            );
+
+        }
+    );
+
+
+/* =========================================================
+   IMPORT
+   ========================================================= */
+
+$("importData")
+    ?.addEventListener(
+        "change",
+        event => {
+
+            const file =
+                event.target.files[0];
+
+
+            if (!file) return;
+
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload =
+                () => {
+
+                    try {
+
+                        const backup =
+                            JSON.parse(
+                                reader.result
+                            );
+
+
+                        const imported =
+                            backup.data ||
+                            backup;
+
+
+                        if (
+                            !imported ||
+                            typeof imported !==
+                            "object"
+                        ) {
+
+                            throw new Error(
+                                "Invalid backup"
+                            );
+
+                        }
+
+
+                        data = {
+
+                            ...structuredClone(
+                                DEFAULT_DATA
+                            ),
+
+                            ...imported,
+
+                            settings: {
+                                ...DEFAULT_DATA.settings,
+                                ...(imported.settings || {})
+                            },
+
+                            plan: {
+                                ...DEFAULT_DATA.plan,
+                                ...(imported.plan || {}),
+                                rules: {
+                                    ...DEFAULT_DATA.plan.rules,
+                                    ...(
+                                        imported.plan?.rules ||
+                                        {}
+                                    )
+                                }
+                            },
+
+                            trades:
+                                Array.isArray(
+                                    imported.trades
+                                )
+                                    ? imported.trades
+                                    : []
+
+                        };
+
+
+                        localStorage.setItem(
+                            STORAGE_KEY,
+                            JSON.stringify(data)
+                        );
+
+
+                        updateEverything();
+
+
+                        showToast(
+                            "Backup imported."
+                        );
+
+
+                    } catch {
+
+                        showToast(
+                            "Invalid backup file."
+                        );
+
+                    }
+
+
+                    event.target.value = "";
+
+                };
+
+
+            reader.readAsText(file);
+
+        }
+    );
+
+
+/* =========================================================
+   CLEAR DATA
+   ========================================================= */
+
+$("clearData")
+    ?.addEventListener(
+        "click",
+        () => {
+
+            if (
+                !confirm(
+                    "Delete all TradingEdge data from this browser?"
+                )
+            ) {
+
+                return;
+
+            }
+
+
+            localStorage.removeItem(
+                STORAGE_KEY
+            );
+
+
+            data =
+                structuredClone(
+                    DEFAULT_DATA
+                );
+
+
+            updateEverything();
+
+
+            showToast(
+                "All data cleared."
+            );
+
+        }
+    );
+
+
+/* =========================================================
+   UPDATE EVERYTHING
+   ========================================================= */
+
+function updateEverything() {
+
+    updateDate();
+
+    loadSettings();
+
+    loadPlan();
+
+    updateDashboard();
+
+    updateChecklist();
+
+    renderJournal();
+
+    updateAnalytics();
+
+}
+
+
+/* =========================================================
+   START APP
+   ========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        updateEverything();
+
+    }
+);
