@@ -3,78 +3,58 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EdgeFlo | Live Execution Terminal</title>
+  <title>EdgeFlo | Forex Execution & Trade Journal Hub</title>
   <link rel="stylesheet" href="styles.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 </head>
 <body>
 
-  <!-- Navigation -->
+  <!-- Top Live Forex Ticker -->
+  <div class="ticker-bar">
+    <div class="tradingview-widget-container">
+      <div class="tradingview-widget-container__widget"></div>
+      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+      {
+        "symbols": [
+          { "proName": "FX_IDC:EURUSD", "title": "EUR/USD" },
+          { "proName": "FX_IDC:GBPUSD", "title": "GBP/USD" },
+          { "proName": "FX_IDC:USDJPY", "title": "USD/JPY" },
+          { "proName": "CAPITALCOM:DXY", "title": "DXY Index" }
+        ],
+        "showSymbolLogo": true,
+        "colorTheme": "dark",
+        "isTransparent": true,
+        "displayMode": "adaptive",
+        "locale": "en"
+      }
+      </script>
+    </div>
+  </div>
+
+  <!-- Navigation Bar -->
   <nav class="navbar">
-    <div class="logo"><span class="glow">EDGE</span>FLO <span class="sub-logo">| Terminal</span></div>
+    <div class="logo"><span class="glow">EDGE</span>FLO <span class="sub-logo">| Forex Terminal</span></div>
     <div class="nav-links">
-      <a href="#live-prices" class="active">Live Ticker</a>
-      <a href="#chart-section">Chart</a>
-      <a href="#checklist-section">Checklist</a>
+      <a href="#chart-section" class="active">Live Chart</a>
+      <a href="#premarket-section">Pre-Market Plan</a>
+      <a href="#tradeplan-section">Trade Checklist</a>
+      <a href="#journal-section">Trade Journal</a>
+      <a href="#logs-section">Trade History</a>
     </div>
     <div class="status-indicator">
-      <span class="status-dot ready"></span>
-      <span id="ws-status">WebSocket: Live Feed</span>
+      <span class="status-dot" id="status-dot"></span>
+      <span id="status-text">Rules Incomplete</span>
     </div>
   </nav>
 
   <main class="container">
 
-    <!-- Section 1: Real-Time Sub-Second Moving Price Cards -->
-    <section id="live-prices" class="price-cards-grid">
-      
-      <!-- BTC Card -->
-      <div class="price-card" id="card-BTCUSDT">
-        <div class="card-top">
-          <span class="asset-symbol">BTC / USDT</span>
-          <span class="live-badge"><span class="pulse-dot"></span> LIVE</span>
-        </div>
-        <div class="card-main-price" id="price-BTCUSDT">$0.00</div>
-        <div class="card-bottom">
-          <span class="label">24h Change:</span>
-          <span class="change-val" id="change-BTCUSDT">0.00%</span>
-        </div>
-      </div>
-
-      <!-- ETH Card -->
-      <div class="price-card" id="card-ETHUSDT">
-        <div class="card-top">
-          <span class="asset-symbol">ETH / USDT</span>
-          <span class="live-badge"><span class="pulse-dot"></span> LIVE</span>
-        </div>
-        <div class="card-main-price" id="price-ETHUSDT">$0.00</div>
-        <div class="card-bottom">
-          <span class="label">24h Change:</span>
-          <span class="change-val" id="change-ETHUSDT">0.00%</span>
-        </div>
-      </div>
-
-      <!-- SOL Card -->
-      <div class="price-card" id="card-SOLUSDT">
-        <div class="card-top">
-          <span class="asset-symbol">SOL / USDT</span>
-          <span class="live-badge"><span class="pulse-dot"></span> LIVE</span>
-        </div>
-        <div class="card-main-price" id="price-SOLUSDT">$0.00</div>
-        <div class="card-bottom">
-          <span class="label">24h Change:</span>
-          <span class="change-val" id="change-SOLUSDT">0.00%</span>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- Section 2: Live Embedded TradingView Chart -->
+    <!-- 1. Live EUR/USD Interactive Chart -->
     <section id="chart-section" class="card-section">
       <div class="section-header">
         <div>
-          <h2>Interactive Chart</h2>
-          <p class="subtitle">15m Candles • Live Streaming Orderflow</p>
+          <h2>EUR/USD Institutional Terminal</h2>
+          <p class="subtitle">Live Candlestick Order Flow & Technical Analysis</p>
         </div>
       </div>
       
@@ -85,7 +65,7 @@
           <script type="text/javascript">
             new TradingView.widget({
               "autosize": true,
-              "symbol": "BINANCE:BTCUSDT",
+              "symbol": "FX:EURUSD",
               "interval": "15",
               "timezone": "Etc/UTC",
               "theme": "dark",
@@ -101,21 +81,126 @@
       </div>
     </section>
 
-    <!-- Section 3: Dynamic Checklist -->
-    <section id="checklist-section" class="card-section">
+    <!-- 2. Pre-Market Session Plan -->
+    <section id="premarket-section" class="card-section">
+      <div class="section-header">
+        <h2>1. Pre-Market Bias & News Plan</h2>
+        <p class="subtitle">Map out DXY correlation, Economic News, and Session Killzones.</p>
+      </div>
+
+      <div class="plan-grid">
+        <div class="form-group">
+          <label>DXY & HTF Market Bias</label>
+          <textarea id="plan-bias" rows="3" placeholder="e.g. DXY is bearish rejecting 104.50. EUR/USD forming higher lows on 4H..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Session Liquidity & Key Pip Levels</label>
+          <textarea id="plan-levels" rows="3" placeholder="e.g. Asian Range High: 1.0850 | Asian Low: 1.0810. Target London sweep..."></textarea>
+        </div>
+      </div>
+      <div class="plan-footer">
+        <button id="save-plan-btn" class="btn btn-glow">Save Pre-Market Plan</button>
+      </div>
+    </section>
+
+    <!-- 3. In-Trade Execution Checklist -->
+    <section id="tradeplan-section" class="card-section">
       <div class="section-header">
         <div>
-          <h2>Execution Rules</h2>
-          <p class="subtitle">Complete checklist before session start.</p>
+          <h2>2. Execution Rules Checklist</h2>
+          <p class="subtitle">Mandatory confirmations required before opening any trade.</p>
+        </div>
+        <div class="progress-box">
+          <span class="progress-text" id="progress-text">0/0 Completed</span>
+          <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
         </div>
       </div>
 
       <form id="add-rule-form" class="add-rule-form">
-        <input type="text" id="new-rule-input" placeholder="Add custom trading rule..." required />
+        <input type="text" id="new-rule-input" placeholder="Add rule (e.g. Confirm 15m Fair Value Gap alignment)..." required />
         <button type="submit" class="btn btn-secondary">+ Add Rule</button>
       </form>
 
       <div class="checklist-grid" id="checklist-container"></div>
+    </section>
+
+    <!-- 4. After-Trade Journal (With Before & After Screenshots) -->
+    <section id="journal-section" class="card-section">
+      <div class="section-header">
+        <h2>3. Post-Trade Execution Journal</h2>
+        <p class="subtitle">Upload "Before Entry" and "After Exit" chart screenshots for deep reflection.</p>
+      </div>
+
+      <form id="journal-form" class="journal-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Currency Pair</label>
+            <input type="text" id="trade-pair" value="EUR/USD" required />
+          </div>
+          <div class="form-group">
+            <label>Direction</label>
+            <select id="trade-dir">
+              <option value="LONG">LONG (Buy)</option>
+              <option value="SHORT">SHORT (Sell)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Outcome (R:R / Pips)</label>
+            <input type="text" id="trade-result" placeholder="e.g. +3.2R or +28 Pips" required />
+          </div>
+          <div class="form-group">
+            <label>Execution Grade</label>
+            <select id="trade-grade">
+              <option value="A+">A+ Setup (Flawless Execution)</option>
+              <option value="A">A Setup (Followed Plan)</option>
+              <option value="B">B Setup (Slight Impatience)</option>
+              <option value="C">C Setup (FOMO / Mismanagement)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Before & After Screenshots Dropzones -->
+        <div class="screenshots-grid">
+          
+          <!-- BEFORE Screenshot -->
+          <div class="screenshot-box">
+            <label class="box-label">📷 BEFORE Trade Screenshot (Entry Setup)</label>
+            <input type="file" id="img-before-file" accept="image/*" />
+            <input type="url" id="img-before-url" placeholder="OR Paste TradingView Image URL..." />
+            <div id="preview-before-wrap" class="img-preview hidden">
+              <img id="preview-before" src="" alt="Before Chart" />
+            </div>
+          </div>
+
+          <!-- AFTER Screenshot -->
+          <div class="screenshot-box">
+            <label class="box-label">📸 AFTER Trade Screenshot (Exit & Result)</label>
+            <input type="file" id="img-after-file" accept="image/*" />
+            <input type="url" id="img-after-url" placeholder="OR Paste TradingView Image URL..." />
+            <div id="preview-after-wrap" class="img-preview hidden">
+              <img id="preview-after" src="" alt="After Chart" />
+            </div>
+          </div>
+
+        </div>
+
+        <div class="form-group">
+          <label>Execution Notes & Lessons Learned</label>
+          <textarea id="trade-notes" rows="3" placeholder="Did you follow your stop loss? What emotional triggers were present?" required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-glow">Save Trade to History</button>
+      </form>
+    </section>
+
+    <!-- 5. Logged Trades Gallery & History -->
+    <section id="logs-section" class="card-section">
+      <div class="section-header">
+        <h2>4. Trade Review History</h2>
+        <button id="clear-logs-btn" class="btn-secondary">Clear History</button>
+      </div>
+
+      <div id="history-container" class="history-grid"></div>
     </section>
 
   </main>
