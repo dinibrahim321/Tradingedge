@@ -3,145 +3,95 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EdgeFlo | Daily Execution & Journal Hub</title>
+  <title>EdgeFlo | Pre-Market Terminal & Live Charts</title>
   <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
 
-  <!-- Top Navigation -->
+  <!-- Navigation -->
   <nav class="navbar">
-    <div class="logo"><span class="glow">EDGE</span>FLO <span class="sub-logo">| Terminal</span></div>
+    <div class="logo"><span class="glow">EDGE</span>FLO <span class="sub-logo">| Execution Hub</span></div>
     <div class="nav-links">
-      <a href="#checklist" class="active">Pre-Trade Checklist</a>
-      <a href="#journal">Trade Journal</a>
-      <a href="#logs">Logged Trades</a>
+      <a href="#chart-section" class="active">Live Terminal</a>
+      <a href="#plan-section">Pre-Market Plan</a>
+      <a href="#checklist-section">Checklist</a>
     </div>
     <div class="status-indicator">
       <span class="status-dot" id="status-dot"></span>
-      <span id="status-text">System Locked</span>
+      <span id="status-text">Rules Incomplete</span>
     </div>
   </nav>
 
   <main class="container">
 
-    <!-- Section 1: Pre-Trading Checklist -->
-    <section id="checklist" class="card-section">
+    <!-- Section 1: Live Embedded TradingView Chart -->
+    <section id="chart-section" class="card-section">
       <div class="section-header">
         <div>
-          <h2>Pre-Trading Execution Checklist</h2>
-          <p class="subtitle">Complete all mandatory checks before placing trades today.</p>
+          <h2>Live Market Chart</h2>
+          <p class="subtitle">Real-time technical analysis powered by TradingView.</p>
+        </div>
+      </div>
+      
+      <!-- TradingView Widget Container -->
+      <div class="tradingview-widget-container" id="tv-chart-container">
+        <div id="tradingview_chart"></div>
+      </div>
+    </section>
+
+    <!-- Section 2: Pre-Market Plan & Bias Notes -->
+    <section id="plan-section" class="card-section">
+      <div class="section-header">
+        <h2>Daily Pre-Market Plan</h2>
+        <p class="subtitle">Draft your bias, key liquidity pools, and economic news for the session.</p>
+      </div>
+
+      <div class="plan-grid">
+        <div class="form-group">
+          <label>Higher Timeframe Bias & Market Context</label>
+          <textarea id="plan-bias" rows="4" placeholder="e.g. BTC forming higher lows on 4H. Looking for sweep of $63,500 liquidity before long entry..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Key Levels & Target Zones</label>
+          <textarea id="plan-levels" rows="4" placeholder="e.g. Resistance: $65,200 | Support: $63,800 | Stop Hunt Zone: $63,400..."></textarea>
+        </div>
+      </div>
+      <div class="plan-footer">
+        <button id="save-plan-btn" class="btn btn-glow">Save Pre-Market Plan</button>
+        <span id="plan-saved-status" class="saved-status">Auto-saved to local memory</span>
+      </div>
+    </section>
+
+    <!-- Section 3: Dynamic & Editable Pre-Market Checklist -->
+    <section id="checklist-section" class="card-section">
+      <div class="section-header">
+        <div>
+          <h2>Execution Rules & Checklist</h2>
+          <p class="subtitle">Add, edit, or check off your mandatory trading criteria.</p>
         </div>
         <div class="progress-box">
-          <span class="progress-text" id="progress-text">0/5 Completed</span>
+          <span class="progress-text" id="progress-text">0/0 Completed</span>
           <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
         </div>
       </div>
 
-      <div class="checklist-grid" id="checklist-container">
-        <label class="check-item">
-          <input type="checkbox" class="chk-input" data-id="chk-1" />
-          <div class="check-content">
-            <span class="check-title">Economic Calendar & High-Impact News Checked</span>
-            <span class="check-desc">Ensure no major unexpected CPI, FOMC, or NFP releases during your session.</span>
-          </div>
-        </label>
-
-        <label class="check-item">
-          <input type="checkbox" class="chk-input" data-id="chk-2" />
-          <div class="check-content">
-            <span class="check-title">Higher Timeframe Bias Identified</span>
-            <span class="check-desc">Determine daily/4h market structure, key liquidity pools, and order blocks.</span>
-          </div>
-        </label>
-
-        <label class="check-item">
-          <input type="checkbox" class="chk-input" data-id="chk-3" />
-          <div class="check-content">
-            <span class="check-title">Max Daily Risk Limit Set (1-2%)</span>
-            <span class="check-desc">Accept loss parameters before entering position. Hard stop-loss active.</span>
-          </div>
-        </label>
-
-        <label class="check-item">
-          <input type="checkbox" class="chk-input" data-id="chk-4" />
-          <div class="check-content">
-            <span class="check-title">A+ Setup Confluence Confirmed</span>
-            <span class="check-desc">At least 3 technical confluences align with your core trading strategy.</span>
-          </div>
-        </label>
-
-        <label class="check-item">
-          <input type="checkbox" class="chk-input" data-id="chk-5" />
-          <div class="check-content">
-            <span class="check-title">Emotional & Physical Readiness</span>
-            <span class="check-desc">Calm mindset, fully focused, no revenge-trading or fatigue.</span>
-          </div>
-        </label>
-      </div>
-    </section>
-
-    <!-- Section 2: Trade Journaling Form -->
-    <section id="journal" class="card-section">
-      <div class="section-header">
-        <h2>Log a Executed Trade</h2>
-        <p class="subtitle">Capture technical data and attach chart screenshots for review.</p>
-      </div>
-
-      <form id="journal-form" class="journal-form">
-        <div class="form-row">
-          <div class="form-group">
-            <label>Asset / Pair</label>
-            <input type="text" id="trade-asset" placeholder="e.g. BTC/USD, NQ, EUR/USD" required />
-          </div>
-          <div class="form-group">
-            <label>Direction</label>
-            <select id="trade-type">
-              <option value="LONG">LONG (Buy)</option>
-              <option value="SHORT">SHORT (Sell)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Outcome (R:R or PnL)</label>
-            <input type="text" id="trade-result" placeholder="e.g. +2.5R or -$150" required />
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Execution Notes & Reflection</label>
-          <textarea id="trade-notes" rows="3" placeholder="Why did you take this trade? Did you follow your plan strictly?" required></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>Attach Chart Screenshot (File or Paste Image URL)</label>
-          <div class="file-dropzone">
-            <input type="file" id="trade-screenshot-file" accept="image/*" />
-            <span class="or-text">OR Paste Image Link:</span>
-            <input type="url" id="trade-screenshot-url" placeholder="https://tradingview.com/x/... or https://i.imgur.com/..." />
-          </div>
-          <div id="image-preview-container" class="image-preview-container hidden">
-            <img id="image-preview" src="" alt="Screenshot Preview" />
-          </div>
-        </div>
-
-        <button type="submit" class="btn btn-glow">Save Entry to Journal</button>
+      <!-- Add New Rule Form -->
+      <form id="add-rule-form" class="add-rule-form">
+        <input type="text" id="new-rule-input" placeholder="Type a new pre-market rule (e.g., Check 15m Order Block alignment)..." required />
+        <button type="submit" class="btn btn-secondary">+ Add Rule</button>
       </form>
-    </section>
 
-    <!-- Section 3: Trade Log Gallery -->
-    <section id="logs" class="card-section">
-      <div class="section-header">
-        <h2>Your Trade History & Screenshots</h2>
-        <button id="clear-logs-btn" class="btn-secondary">Clear History</button>
-      </div>
-      
-      <div id="trade-cards-container" class="journal-cards-grid">
-        <!-- Dynamic Cards Inserted via JS -->
+      <!-- Checklist Items Grid -->
+      <div class="checklist-grid" id="checklist-container">
+        <!-- Rendered Dynamically via JS -->
       </div>
     </section>
 
   </main>
 
+  <!-- TradingView Library -->
+  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
