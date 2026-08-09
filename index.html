@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EdgeFlo | Pre-Market Terminal & Live Charts</title>
+  <title>EdgeFlo | Live Execution Terminal</title>
   <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 </head>
@@ -11,87 +11,115 @@
 
   <!-- Navigation -->
   <nav class="navbar">
-    <div class="logo"><span class="glow">EDGE</span>FLO <span class="sub-logo">| Execution Hub</span></div>
+    <div class="logo"><span class="glow">EDGE</span>FLO <span class="sub-logo">| Terminal</span></div>
     <div class="nav-links">
-      <a href="#chart-section" class="active">Live Terminal</a>
-      <a href="#plan-section">Pre-Market Plan</a>
+      <a href="#live-prices" class="active">Live Ticker</a>
+      <a href="#chart-section">Chart</a>
       <a href="#checklist-section">Checklist</a>
     </div>
     <div class="status-indicator">
-      <span class="status-dot" id="status-dot"></span>
-      <span id="status-text">Rules Incomplete</span>
+      <span class="status-dot ready"></span>
+      <span id="ws-status">WebSocket: Live Feed</span>
     </div>
   </nav>
 
   <main class="container">
 
-    <!-- Section 1: Live Embedded TradingView Chart -->
+    <!-- Section 1: Real-Time Sub-Second Moving Price Cards -->
+    <section id="live-prices" class="price-cards-grid">
+      
+      <!-- BTC Card -->
+      <div class="price-card" id="card-BTCUSDT">
+        <div class="card-top">
+          <span class="asset-symbol">BTC / USDT</span>
+          <span class="live-badge"><span class="pulse-dot"></span> LIVE</span>
+        </div>
+        <div class="card-main-price" id="price-BTCUSDT">$0.00</div>
+        <div class="card-bottom">
+          <span class="label">24h Change:</span>
+          <span class="change-val" id="change-BTCUSDT">0.00%</span>
+        </div>
+      </div>
+
+      <!-- ETH Card -->
+      <div class="price-card" id="card-ETHUSDT">
+        <div class="card-top">
+          <span class="asset-symbol">ETH / USDT</span>
+          <span class="live-badge"><span class="pulse-dot"></span> LIVE</span>
+        </div>
+        <div class="card-main-price" id="price-ETHUSDT">$0.00</div>
+        <div class="card-bottom">
+          <span class="label">24h Change:</span>
+          <span class="change-val" id="change-ETHUSDT">0.00%</span>
+        </div>
+      </div>
+
+      <!-- SOL Card -->
+      <div class="price-card" id="card-SOLUSDT">
+        <div class="card-top">
+          <span class="asset-symbol">SOL / USDT</span>
+          <span class="live-badge"><span class="pulse-dot"></span> LIVE</span>
+        </div>
+        <div class="card-main-price" id="price-SOLUSDT">$0.00</div>
+        <div class="card-bottom">
+          <span class="label">24h Change:</span>
+          <span class="change-val" id="change-SOLUSDT">0.00%</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Section 2: Live Embedded TradingView Chart -->
     <section id="chart-section" class="card-section">
       <div class="section-header">
         <div>
-          <h2>Live Market Chart</h2>
-          <p class="subtitle">Real-time technical analysis powered by TradingView.</p>
+          <h2>Interactive Chart</h2>
+          <p class="subtitle">15m Candles • Live Streaming Orderflow</p>
         </div>
       </div>
       
-      <!-- TradingView Widget Container -->
-      <div class="tradingview-widget-container" id="tv-chart-container">
-        <div id="tradingview_chart"></div>
+      <div class="chart-wrapper">
+        <div class="tradingview-widget-container" style="height:100%;width:100%">
+          <div id="tradingview_chart" style="height:100%;width:100%"></div>
+          <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+          <script type="text/javascript">
+            new TradingView.widget({
+              "autosize": true,
+              "symbol": "BINANCE:BTCUSDT",
+              "interval": "15",
+              "timezone": "Etc/UTC",
+              "theme": "dark",
+              "style": "1",
+              "locale": "en",
+              "toolbar_bg": "#0a0d14",
+              "enable_publishing": false,
+              "allow_symbol_change": true,
+              "container_id": "tradingview_chart"
+            });
+          </script>
+        </div>
       </div>
     </section>
 
-    <!-- Section 2: Pre-Market Plan & Bias Notes -->
-    <section id="plan-section" class="card-section">
-      <div class="section-header">
-        <h2>Daily Pre-Market Plan</h2>
-        <p class="subtitle">Draft your bias, key liquidity pools, and economic news for the session.</p>
-      </div>
-
-      <div class="plan-grid">
-        <div class="form-group">
-          <label>Higher Timeframe Bias & Market Context</label>
-          <textarea id="plan-bias" rows="4" placeholder="e.g. BTC forming higher lows on 4H. Looking for sweep of $63,500 liquidity before long entry..."></textarea>
-        </div>
-        <div class="form-group">
-          <label>Key Levels & Target Zones</label>
-          <textarea id="plan-levels" rows="4" placeholder="e.g. Resistance: $65,200 | Support: $63,800 | Stop Hunt Zone: $63,400..."></textarea>
-        </div>
-      </div>
-      <div class="plan-footer">
-        <button id="save-plan-btn" class="btn btn-glow">Save Pre-Market Plan</button>
-        <span id="plan-saved-status" class="saved-status">Auto-saved to local memory</span>
-      </div>
-    </section>
-
-    <!-- Section 3: Dynamic & Editable Pre-Market Checklist -->
+    <!-- Section 3: Dynamic Checklist -->
     <section id="checklist-section" class="card-section">
       <div class="section-header">
         <div>
-          <h2>Execution Rules & Checklist</h2>
-          <p class="subtitle">Add, edit, or check off your mandatory trading criteria.</p>
-        </div>
-        <div class="progress-box">
-          <span class="progress-text" id="progress-text">0/0 Completed</span>
-          <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+          <h2>Execution Rules</h2>
+          <p class="subtitle">Complete checklist before session start.</p>
         </div>
       </div>
 
-      <!-- Add New Rule Form -->
       <form id="add-rule-form" class="add-rule-form">
-        <input type="text" id="new-rule-input" placeholder="Type a new pre-market rule (e.g., Check 15m Order Block alignment)..." required />
+        <input type="text" id="new-rule-input" placeholder="Add custom trading rule..." required />
         <button type="submit" class="btn btn-secondary">+ Add Rule</button>
       </form>
 
-      <!-- Checklist Items Grid -->
-      <div class="checklist-grid" id="checklist-container">
-        <!-- Rendered Dynamically via JS -->
-      </div>
+      <div class="checklist-grid" id="checklist-container"></div>
     </section>
 
   </main>
 
-  <!-- TradingView Library -->
-  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
