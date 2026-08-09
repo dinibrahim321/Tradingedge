@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EdgeFlo | Forex Execution & Trade Journal Hub</title>
+  <title>EdgeFlo | Institutional Forex Execution Hub</title>
   <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 </head>
 <body>
 
-  <!-- Top Live Forex Ticker -->
+  <!-- Top Institutional Ticker Bar -->
   <div class="ticker-bar">
     <div class="tradingview-widget-container">
       <div class="tradingview-widget-container__widget"></div>
@@ -31,176 +31,176 @@
     </div>
   </div>
 
-  <!-- Navigation Bar -->
-  <nav class="navbar">
-    <div class="logo"><span class="glow">EDGE</span>FLO <span class="sub-logo">| Forex Terminal</span></div>
-    <div class="nav-links">
+  <!-- Professional Navigation Header -->
+  <header class="navbar">
+    <div class="brand-logo"><span class="glow">EDGE</span>FLO <span class="sub-badge">TERMINAL</span></div>
+    <nav class="nav-links">
       <a href="#chart-section" class="active">Live Chart</a>
       <a href="#premarket-section">Pre-Market Plan</a>
-      <a href="#tradeplan-section">Trade Checklist</a>
-      <a href="#journal-section">Trade Journal</a>
-      <a href="#logs-section">Trade History</a>
-    </div>
-    <div class="status-indicator">
+      <a href="#checklist-section">Discipline Rules</a>
+      <a href="#journal-section">Post-Trade Journal</a>
+    </nav>
+    <div class="system-status-pill">
       <span class="status-dot" id="status-dot"></span>
-      <span id="status-text">Rules Incomplete</span>
+      <span id="status-text">System Locked</span>
     </div>
-  </nav>
+  </header>
 
-  <main class="container">
+  <!-- Main Application Container -->
+  <main class="app-container">
 
-    <!-- 1. Live EUR/USD Interactive Chart -->
-    <section id="chart-section" class="card-section">
-      <div class="section-header">
+    <!-- Section 1: Live Chart Dashboard -->
+    <section id="chart-section" class="terminal-card">
+      <div class="card-header-flex">
         <div>
-          <h2>EUR/USD Institutional Terminal</h2>
-          <p class="subtitle">Live Candlestick Order Flow & Technical Analysis</p>
+          <h2>EUR/USD Execution Chart</h2>
+          <p class="card-subtitle">Real-time institutional liquidity feeds & technical tools</p>
         </div>
+        <div class="session-badge">London / NY Killzone</div>
       </div>
-      
-      <div class="chart-wrapper">
-        <div class="tradingview-widget-container" style="height:100%;width:100%">
-          <div id="tradingview_chart" style="height:100%;width:100%"></div>
-          <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-          <script type="text/javascript">
-            new TradingView.widget({
-              "autosize": true,
-              "symbol": "FX:EURUSD",
-              "interval": "15",
-              "timezone": "Etc/UTC",
-              "theme": "dark",
-              "style": "1",
-              "locale": "en",
-              "toolbar_bg": "#0a0d14",
-              "enable_publishing": false,
-              "allow_symbol_change": true,
-              "container_id": "tradingview_chart"
-            });
-          </script>
-        </div>
+      <div class="tradingview-embed-box">
+        <div id="tradingview_chart" style="height:100%;width:100%"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+        <script type="text/javascript">
+          new TradingView.widget({
+            "autosize": true,
+            "symbol": "FX:EURUSD",
+            "interval": "15",
+            "timezone": "Etc/UTC",
+            "theme": "dark",
+            "style": "1",
+            "locale": "en",
+            "toolbar_bg": "#0e121b",
+            "enable_publishing": false,
+            "allow_symbol_change": true,
+            "container_id": "tradingview_chart"
+          });
+        </script>
       </div>
     </section>
 
-    <!-- 2. Pre-Market Session Plan -->
-    <section id="premarket-section" class="card-section">
-      <div class="section-header">
-        <h2>1. Pre-Market Bias & News Plan</h2>
-        <p class="subtitle">Map out DXY correlation, Economic News, and Session Killzones.</p>
-      </div>
-
-      <div class="plan-grid">
-        <div class="form-group">
-          <label>DXY & HTF Market Bias</label>
-          <textarea id="plan-bias" rows="3" placeholder="e.g. DXY is bearish rejecting 104.50. EUR/USD forming higher lows on 4H..."></textarea>
-        </div>
-        <div class="form-group">
-          <label>Session Liquidity & Key Pip Levels</label>
-          <textarea id="plan-levels" rows="3" placeholder="e.g. Asian Range High: 1.0850 | Asian Low: 1.0810. Target London sweep..."></textarea>
+    <!-- Section 2: Pre-Market Routine & Bias Plan -->
+    <section id="premarket-section" class="terminal-card">
+      <div class="card-header-flex">
+        <div>
+          <h2>1. Pre-Market Routine & Bias</h2>
+          <p class="card-subtitle">Lock in your macro bias and key levels before taking risk</p>
         </div>
       </div>
-      <div class="plan-footer">
-        <button id="save-plan-btn" class="btn btn-glow">Save Pre-Market Plan</button>
+      <div class="grid-2col">
+        <div class="input-group">
+          <label>DXY & Higher Timeframe Bias</label>
+          <textarea id="plan-bias" rows="3" placeholder="e.g. DXY is sweeping 104.20 liquidity. Looking for bullish continuation on EUR..."></textarea>
+        </div>
+        <div class="input-group">
+          <label>Key Session Levels & Targets</label>
+          <textarea id="plan-levels" rows="3" placeholder="e.g. Asian High: 1.0855 | Asian Low: 1.0810 | Invalidation: 1.0790..."></textarea>
+        </div>
+      </div>
+      <div class="card-footer-action">
+        <button id="save-plan-btn" class="btn-primary">Save Pre-Market Plan</button>
       </div>
     </section>
 
-    <!-- 3. In-Trade Execution Checklist -->
-    <section id="tradeplan-section" class="card-section">
-      <div class="section-header">
+    <!-- Section 3: Discipline Guardrails Checklist -->
+    <section id="checklist-section" class="terminal-card">
+      <div class="card-header-flex">
         <div>
-          <h2>2. Execution Rules Checklist</h2>
-          <p class="subtitle">Mandatory confirmations required before opening any trade.</p>
+          <h2>2. Discipline Execution Rules</h2>
+          <p class="card-subtitle">Complete mandatory criteria to unlock terminal execution</p>
         </div>
-        <div class="progress-box">
+        <div class="progress-indicator-box">
           <span class="progress-text" id="progress-text">0/0 Completed</span>
-          <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+          <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
         </div>
       </div>
 
-      <form id="add-rule-form" class="add-rule-form">
-        <input type="text" id="new-rule-input" placeholder="Add rule (e.g. Confirm 15m Fair Value Gap alignment)..." required />
-        <button type="submit" class="btn btn-secondary">+ Add Rule</button>
+      <form id="add-rule-form" class="inline-form">
+        <input type="text" id="new-rule-input" placeholder="Add custom guardrail rule (e.g. Check ForexFactory Calendar)..." required />
+        <button type="submit" class="btn-secondary">+ Add Rule</button>
       </form>
 
-      <div class="checklist-grid" id="checklist-container"></div>
+      <div class="checklist-stack" id="checklist-container"></div>
     </section>
 
-    <!-- 4. After-Trade Journal (With Before & After Screenshots) -->
-    <section id="journal-section" class="card-section">
-      <div class="section-header">
-        <h2>3. Post-Trade Execution Journal</h2>
-        <p class="subtitle">Upload "Before Entry" and "After Exit" chart screenshots for deep reflection.</p>
+    <!-- Section 4: Post-Trade Journal with Before & After Screenshots -->
+    <section id="journal-section" class="terminal-card">
+      <div class="card-header-flex">
+        <div>
+          <h2>3. Post-Trade Review & Screenshots</h2>
+          <p class="card-subtitle">Upload visual proof of your setup before and after execution</p>
+        </div>
       </div>
 
-      <form id="journal-form" class="journal-form">
-        <div class="form-row">
-          <div class="form-group">
-            <label>Currency Pair</label>
+      <form id="journal-form" class="journal-form-grid">
+        <div class="grid-4col">
+          <div class="input-group">
+            <label>Asset Pair</label>
             <input type="text" id="trade-pair" value="EUR/USD" required />
           </div>
-          <div class="form-group">
+          <div class="input-group">
             <label>Direction</label>
             <select id="trade-dir">
               <option value="LONG">LONG (Buy)</option>
               <option value="SHORT">SHORT (Sell)</option>
             </select>
           </div>
-          <div class="form-group">
-            <label>Outcome (R:R / Pips)</label>
-            <input type="text" id="trade-result" placeholder="e.g. +3.2R or +28 Pips" required />
+          <div class="input-group">
+            <label>Result / Outcome</label>
+            <input type="text" id="trade-result" placeholder="+2.5R or +30 Pips" required />
           </div>
-          <div class="form-group">
+          <div class="input-group">
             <label>Execution Grade</label>
             <select id="trade-grade">
-              <option value="A+">A+ Setup (Flawless Execution)</option>
-              <option value="A">A Setup (Followed Plan)</option>
-              <option value="B">B Setup (Slight Impatience)</option>
-              <option value="C">C Setup (FOMO / Mismanagement)</option>
+              <option value="A+">A+ Setup (Flawless)</option>
+              <option value="A">A Setup (Clean)</option>
+              <option value="B">B Setup (Minor Flaw)</option>
+              <option value="C">C Setup (Rule Broken)</option>
             </select>
           </div>
         </div>
 
-        <!-- Before & After Screenshots Dropzones -->
-        <div class="screenshots-grid">
-          
-          <!-- BEFORE Screenshot -->
-          <div class="screenshot-box">
-            <label class="box-label">📷 BEFORE Trade Screenshot (Entry Setup)</label>
-            <input type="file" id="img-before-file" accept="image/*" />
-            <input type="url" id="img-before-url" placeholder="OR Paste TradingView Image URL..." />
-            <div id="preview-before-wrap" class="img-preview hidden">
-              <img id="preview-before" src="" alt="Before Chart" />
+        <!-- Before & After Image Drop/Link Zones -->
+        <div class="screenshot-dropzone-grid">
+          <div class="pane-upload">
+            <span class="pane-title">📷 BEFORE ENTRY (Setup Analysis)</span>
+            <input type="file" id="file-before" accept="image/*" class="file-input-hidden" />
+            <input type="url" id="url-before" placeholder="Paste TradingView image URL..." />
+            <div id="preview-before-box" class="image-preview-frame hidden">
+              <img id="img-preview-before" src="" alt="Before Entry" />
             </div>
           </div>
 
-          <!-- AFTER Screenshot -->
-          <div class="screenshot-box">
-            <label class="box-label">📸 AFTER Trade Screenshot (Exit & Result)</label>
-            <input type="file" id="img-after-file" accept="image/*" />
-            <input type="url" id="img-after-url" placeholder="OR Paste TradingView Image URL..." />
-            <div id="preview-after-wrap" class="img-preview hidden">
-              <img id="preview-after" src="" alt="After Chart" />
+          <div class="pane-upload">
+            <span class="pane-title">📸 AFTER EXIT (Result & Management)</span>
+            <input type="file" id="file-after" accept="image/*" class="file-input-hidden" />
+            <input type="url" id="url-after" placeholder="Paste TradingView image URL..." />
+            <div id="preview-after-box" class="image-preview-frame hidden">
+              <img id="img-preview-after" src="" alt="After Exit" />
             </div>
           </div>
-
         </div>
 
-        <div class="form-group">
-          <label>Execution Notes & Lessons Learned</label>
-          <textarea id="trade-notes" rows="3" placeholder="Did you follow your stop loss? What emotional triggers were present?" required></textarea>
+        <div class="input-group">
+          <label>Psychology & Review Notes</label>
+          <textarea id="trade-notes" rows="3" placeholder="What did you learn? Did you stick to your target management rules?" required></textarea>
         </div>
 
-        <button type="submit" class="btn btn-glow">Save Trade to History</button>
+        <button type="submit" class="btn-primary">Log Trade to Journal</button>
       </form>
     </section>
 
-    <!-- 5. Logged Trades Gallery & History -->
-    <section id="logs-section" class="card-section">
-      <div class="section-header">
-        <h2>4. Trade Review History</h2>
+    <!-- Section 5: Trade History Logs -->
+    <section class="terminal-card">
+      <div class="card-header-flex">
+        <div>
+          <h2>Trade History & Visual Review</h2>
+          <p class="card-subtitle">Your saved session entries and screen captures</p>
+        </div>
         <button id="clear-logs-btn" class="btn-secondary">Clear History</button>
       </div>
 
-      <div id="history-container" class="history-grid"></div>
+      <div id="history-container" class="history-stack"></div>
     </section>
 
   </main>
