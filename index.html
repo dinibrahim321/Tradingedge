@@ -1,1195 +1,1942 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TradingEdge</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:#0b0f14;
-  color:#f5f7fa;
-  font-family:Arial,sans-serif;
-}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
+  <title>TradingEdge</title>
 
-.app{display:flex;min-height:100vh}
-
-.sidebar{
-  width:230px;
-  position:fixed;
-  top:0;
-  bottom:0;
-  background:#0d1219;
-  border-right:1px solid #252e3a;
-  padding:20px 14px;
-}
-
-.logo{
-  font-size:21px;
-  font-weight:bold;
-  margin-bottom:30px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.logo-icon{
-  width:35px;
-  height:35px;
-  border-radius:8px;
-  background:#31d07c;
-  color:#06130b;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:bold;
-}
-
-nav{
-  display:flex;
-  flex-direction:column;
-  gap:5px;
-}
-
-.nav{
-  width:100%;
-  padding:12px;
-  border:0;
-  border-radius:8px;
-  background:transparent;
-  color:#8c98a8;
-  text-align:left;
-}
-
-.nav:hover,
-.nav.active{
-  background:#17211c;
-  color:#31d07c;
-}
-
-.main{
-  margin-left:230px;
-  width:calc(100% - 230px);
-}
-
-.top{
-  height:70px;
-  border-bottom:1px solid #252e3a;
-  padding:0 30px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-
-.top h1{
-  margin:0 0 4px;
-  font-size:20px;
-}
-
-.top small{color:#8c98a8}
-
-.content{
-  max-width:1400px;
-  margin:auto;
-  padding:30px;
-}
-
-.page{display:none}
-.page.active{display:block}
-
-.heading{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:15px;
-  margin-bottom:20px;
-}
-
-.heading h2{margin:0 0 5px}
-.heading p{margin:0;color:#8c98a8}
-
-.cards{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:15px;
-  margin-bottom:18px;
-}
-
-.card,.panel{
-  background:#111720;
-  border:1px solid #252e3a;
-  border-radius:11px;
-  padding:20px;
-}
-
-.card span{
-  display:block;
-  color:#8c98a8;
-  font-size:13px;
-  margin-bottom:8px;
-}
-
-.card strong{font-size:24px}
-
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:18px;
-}
-
-.panel{margin-bottom:18px}
-.panel h3{margin-top:0}
-
-.primary,
-.secondary,
-.danger{
-  padding:10px 15px;
-  border-radius:7px;
-}
-
-.primary{
-  background:#31d07c;
-  color:#06130b;
-  border:0;
-  font-weight:bold;
-}
-
-.secondary{
-  background:#161d27;
-  color:#fff;
-  border:1px solid #303a47;
-}
-
-.danger{
-  background:#29151a;
-  color:#ff5d6c;
-  border:1px solid #69303a;
-}
-
-.progress{
-  height:7px;
-  background:#202832;
-  border-radius:10px;
-  overflow:hidden;
-  margin:8px 0 18px;
-}
-
-.progress div{
-  height:100%;
-  width:0;
-  background:#31d07c;
-}
-
-.gate{
-  padding:14px;
-  border-radius:8px;
-  margin-top:15px;
-}
-
-.gate.ok{
-  background:#102319;
-  border:1px solid #27643f;
-}
-
-.gate.bad{
-  background:#29151a;
-  border:1px solid #69303a;
-}
-
-.gate p{
-  color:#9ba6b4;
-  font-size:13px;
-}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-}
-
-th,td{
-  padding:12px;
-  border-bottom:1px solid #222b35;
-  text-align:left;
-  font-size:13px;
-}
-
-th{
-  color:#8c98a8;
-  font-size:11px;
-}
-
-.empty{
-  text-align:center;
-  color:#8c98a8;
-  padding:30px;
-}
-
-.formgrid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:15px;
-}
-
-label{
-  display:flex;
-  flex-direction:column;
-  gap:7px;
-  color:#8c98a8;
-  font-size:13px;
-  margin-bottom:15px;
-}
-
-input,select,textarea{
-  width:100%;
-  background:#0b1016;
-  color:#fff;
-  border:1px solid #29333f;
-  border-radius:7px;
-  padding:11px;
-}
-
-textarea{
-  min-height:120px;
-  resize:vertical;
-}
-
-.check{
-  flex-direction:row;
-  align-items:center;
-  background:#0d131a;
-  border:1px solid #252e3a;
-  border-radius:7px;
-  padding:13px;
-  color:#d8dfe7;
-}
-
-.check input{
-  width:18px;
-  height:18px;
-  accent-color:#31d07c;
-}
-
-.results{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:12px;
-  margin-top:20px;
-}
-
-.result{
-  background:#0b1016;
-  border:1px solid #252e3a;
-  border-radius:8px;
-  padding:15px;
-}
-
-.result span{
-  display:block;
-  color:#8c98a8;
-  font-size:12px;
-  margin-bottom:7px;
-}
-
-.modal{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:#000b;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-  z-index:100;
-}
-
-.modal.open{display:flex}
-
-.modalbox{
-  width:min(650px,100%);
-  max-height:90vh;
-  overflow:auto;
-  background:#111720;
-  border:1px solid #303a47;
-  border-radius:12px;
-  padding:24px;
-}
-
-.modalhead{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-}
-
-.close{
-  background:none;
-  border:0;
-  color:#8c98a8;
-  font-size:28px;
-}
-
-.toast{
-  display:none;
-  position:fixed;
-  right:20px;
-  bottom:20px;
-  background:#18201c;
-  border:1px solid #31d07c;
-  padding:12px 16px;
-  border-radius:7px;
-  z-index:200;
-}
-
-.toast.show{display:block}
-
-.mobile{display:none}
-
-@media(max-width:900px){
-
-  .sidebar{
-    transform:translateX(-100%);
-    z-index:50;
-    transition:.2s;
-  }
-
-  .sidebar.open{
-    transform:translateX(0);
-  }
-
-  .main{
-    margin-left:0;
-    width:100%;
-  }
-
-  .mobile{
-    display:block;
-    background:none;
-    border:0;
-    color:#fff;
-    font-size:22px;
-  }
-
-  .top{padding:0 15px}
-  .content{padding:20px 15px}
-
-  .cards{
-    grid-template-columns:1fr 1fr;
-  }
-
-  .grid{
-    grid-template-columns:1fr;
-  }
-}
-
-@media(max-width:550px){
-
-  .cards,
-  .formgrid,
-  .results{
-    grid-template-columns:1fr;
-  }
-
-  .heading{
-    flex-direction:column;
-    align-items:flex-start;
-  }
-
-  table{
-    min-width:650px;
-  }
-
-  .panel{
-    overflow-x:auto;
-  }
-}
-</style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
 
-<div class="app">
+  <div class="app">
 
-<aside class="sidebar" id="sidebar">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
 
-<div class="logo">
-<div class="logo-icon">T</div>
-TradingEdge
-</div>
+      <div class="brand">
+        <div class="brand-logo">TE</div>
 
-<nav>
+        <div>
+          <h1>TradingEdge</h1>
+          <span>Trading Journal</span>
+        </div>
+      </div>
 
-<button class="nav active" data-page="dashboard">
-▦ Dashboard
-</button>
+      <nav class="navigation">
 
-<button class="nav" data-page="plan">
-◈ My Plan
-</button>
+        <button class="nav-btn active" data-section="dashboard">
+          <span>📊</span>
+          Dashboard
+        </button>
 
-<button class="nav" data-page="checklist">
-✓ Pre-Trade
-</button>
+        <button class="nav-btn" data-section="plan">
+          <span>🎯</span>
+          My Plan
+        </button>
 
-<button class="nav" data-page="calculator">
-⌁ Risk Calculator
-</button>
+        <button class="nav-btn" data-section="checklist">
+          <span>✅</span>
+          Pre-Trade
+        </button>
 
-<button class="nav" data-page="journal">
-▤ Journal
-</button>
+        <button class="nav-btn" data-section="calculator">
+          <span>🧮</span>
+          Risk Calculator
+        </button>
 
-<button class="nav" data-page="analytics">
-◒ Analytics
-</button>
+        <button class="nav-btn" data-section="journal">
+          <span>📓</span>
+          Trade Journal
+        </button>
 
-<button class="nav" data-page="settings">
-⚙ Settings
-</button>
+        <button class="nav-btn" data-section="analytics">
+          <span>📈</span>
+          Analytics
+        </button>
 
-</nav>
+        <button class="nav-btn" data-section="settings">
+          <span>⚙️</span>
+          Settings
+        </button>
 
-</aside>
+      </nav>
 
-<main class="main">
+      <div class="sidebar-bottom">
 
-<header class="top">
+        <button class="sidebar-action" id="exportBtn">
+          📤 Export Data
+        </button>
 
-<button class="mobile" id="menu">
-☰
-</button>
+        <button class="sidebar-action" id="importBtn">
+          📥 Import Data
+        </button>
 
-<div>
-<h1 id="title">Dashboard</h1>
-<small id="date"></small>
-</div>
+        <input
+          type="file"
+          id="importFile"
+          accept=".json"
+          hidden
+        >
 
-<span style="color:#31d07c">● Local</span>
+      </div>
 
-</header>
+    </aside>
 
-<div class="content">
 
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
 
-<!-- DASHBOARD -->
+      <!-- MOBILE HEADER -->
+      <header class="mobile-header">
 
-<section class="page active" id="dashboard">
+        <button id="mobileMenuBtn" class="icon-btn">
+          ☰
+        </button>
 
-<div class="heading">
+        <div class="mobile-brand">
+          <strong>TradingEdge</strong>
+        </div>
 
-<div>
-<h2>Trading Dashboard</h2>
-<p>Follow your process. Protect your capital.</p>
-</div>
+      </header>
 
-<button class="primary" id="startTrade">
-Start Trade
-</button>
 
-</div>
+      <!-- ================= DASHBOARD ================= -->
 
-<div class="cards">
+      <section id="dashboard" class="page-section active">
 
-<div class="card">
-<span>Account Balance</span>
-<strong id="balance">$10,000.00</strong>
-</div>
+        <div class="page-header">
 
-<div class="card">
-<span>Total P/L</span>
-<strong id="pnl">$0.00</strong>
-</div>
+          <div>
+            <p class="eyebrow">WELCOME BACK</p>
+            <h2>Trading Dashboard</h2>
+            <p class="page-description">
+              Track your trading performance and stay disciplined.
+            </p>
+          </div>
 
-<div class="card">
-<span>Win Rate</span>
-<strong id="winrate">0%</strong>
-</div>
+          <button class="primary-btn" id="dashboardAddTradeBtn">
+            + Add Trade
+          </button>
 
-<div class="card">
-<span>Trades</span>
-<strong id="tradeCount">0</strong>
-</div>
+        </div>
 
-</div>
 
-<div class="grid">
+        <!-- STAT CARDS -->
 
-<div class="panel">
+        <div class="stats-grid">
 
-<h3>Daily Guardrails</h3>
+          <div class="stat-card">
 
-<p>Trades today</p>
+            <div class="stat-icon">💰</div>
 
-<strong>
-<span id="today">0</span> /
-<span id="maxTrades">3</span>
-</strong>
+            <div>
+              <span>Account Balance</span>
+              <strong id="dashboardBalance">$0.00</strong>
+            </div>
 
-<div class="progress">
-<div id="tradebar"></div>
-</div>
+          </div>
 
-<p>Daily loss</p>
 
-<strong>
-$<span id="loss">0</span> /
-$<span id="lossLimit">200</span>
-</strong>
+          <div class="stat-card">
 
-<div class="progress">
-<div id="lossbar"></div>
-</div>
+            <div class="stat-icon">📊</div>
 
-<div class="gate ok" id="dashboardGate">
+            <div>
+              <span>Total Trades</span>
+              <strong id="dashboardTrades">0</strong>
+            </div>
 
-<strong>🟢 TRADING AVAILABLE</strong>
+          </div>
 
-<p>
-You may begin your checklist.
-</p>
 
-</div>
+          <div class="stat-card">
 
-</div>
+            <div class="stat-icon">🏆</div>
 
-<div class="panel">
+            <div>
+              <span>Win Rate</span>
+              <strong id="dashboardWinRate">0%</strong>
+            </div>
 
-<h3>Your Rules</h3>
+          </div>
 
-<div style="color:#c8d0da;line-height:2">
 
-<div>✓ Trade only with market context.</div>
-<div>✓ Wait for your setup.</div>
-<div>✓ Respect your risk.</div>
-<div>✓ Never chase the market.</div>
+          <div class="stat-card">
 
-</div>
+            <div class="stat-icon">📈</div>
 
-</div>
+            <div>
+              <span>Net P/L</span>
+              <strong id="dashboardProfit">$0.00</strong>
+            </div>
 
-</div>
+          </div>
 
-<div class="panel">
+        </div>
 
-<h3>Recent Trades</h3>
 
-<table>
+        <!-- DASHBOARD CONTENT -->
 
-<thead>
-<tr>
-<th>Date</th>
-<th>Pair</th>
-<th>Direction</th>
-<th>Result</th>
-<th>R</th>
-<th>P/L</th>
-</tr>
-</thead>
+        <div class="dashboard-grid">
 
-<tbody id="recent">
+          <div class="panel">
 
-<tr>
-<td colspan="6" class="empty">
-No trades recorded yet.
-</td>
-</tr>
+            <div class="panel-header">
 
-</tbody>
+              <div>
+                <h3>Recent Trades</h3>
+                <p>Your latest journal entries.</p>
+              </div>
 
-</table>
+              <button
+                class="text-btn"
+                data-go-section="journal"
+              >
+                View All
+              </button>
 
-</div>
+            </div>
 
-</section>
+            <div id="recentTrades" class="recent-trades">
 
+              <div class="empty-state">
+                <div class="empty-icon">📓</div>
 
-<!-- PLAN -->
+                <h4>No trades yet</h4>
 
-<section class="page" id="plan">
+                <p>
+                  Add your first trade to start building
+                  your trading journal.
+                </p>
 
-<div class="heading">
+                <button
+                  class="primary-btn"
+                  id="emptyAddTradeBtn"
+                >
+                  Add First Trade
+                </button>
 
-<div>
-<h2>My Trading Plan</h2>
-<p>Define your rules before trading.</p>
-</div>
+              </div>
 
-<button class="primary" id="savePlan">
-Save Plan
-</button>
+            </div>
 
-</div>
+          </div>
 
-<div class="panel">
 
-<div class="formgrid">
+          <div class="panel">
 
-<label>
-Higher Timeframe
+            <div class="panel-header">
 
-<select id="htf">
-<option>Daily</option>
-<option selected>4H</option>
-<option>1H</option>
-</select>
+              <div>
+                <h3>Trading Rules</h3>
+                <p>Your current discipline settings.</p>
+              </div>
 
-</label>
+              <button
+                class="text-btn"
+                data-go-section="plan"
+              >
+                Edit
+              </button>
 
-<label>
-Entry Timeframe
+            </div>
 
-<select id="entrytf">
-<option>5M</option>
-<option selected>15M</option>
-<option>30M</option>
-</select>
+            <div id="dashboardRules" class="rules-list">
 
-</label>
+              <div class="rule-row">
+                <span>Risk Per Trade</span>
+                <strong id="dashboardRisk">1%</strong>
+              </div>
 
-</div>
+              <div class="rule-row">
+                <span>Maximum Trades</span>
+                <strong id="dashboardMaxTrades">3</strong>
+              </div>
 
-<h3>Trading Rules</h3>
+              <div class="rule-row">
+                <span>Minimum R:R</span>
+                <strong id="dashboardMinRR">1:2</strong>
+              </div>
 
-<label class="check">
-<input type="checkbox" class="planrule" checked>
-Higher timeframe context is clear.
-</label>
+              <div class="rule-row">
+                <span>Daily Loss Limit</span>
+                <strong id="dashboardDailyLoss">3%</strong>
+              </div>
 
-<label class="check">
-<input type="checkbox" class="planrule" checked>
-Price is at a valid supply/demand zone.
-</label>
+            </div>
 
-<label class="check">
-<input type="checkbox" class="planrule" checked>
-Liquidity has been considered.
-</label>
+          </div>
 
-<label class="check">
-<input type="checkbox" class="planrule" checked>
-Market structure supports the trade.
-</label>
+        </div>
 
-<label class="check">
-<input type="checkbox" class="planrule" checked>
-Risk is within my limit.
-</label>
+      </section>
 
-<label class="check">
-<input type="checkbox" class="planrule" checked>
-Trade meets my minimum R:R.
-</label>
 
-<label>
-Additional Notes
+      <!-- ================= MY PLAN ================= -->
 
-<textarea id="notes" placeholder="Write your trading rules..."></textarea>
+      <section id="plan" class="page-section">
 
-</label>
+        <div class="page-header">
 
-</div>
+          <div>
+            <p class="eyebrow">TRADING PLAN</p>
+            <h2>My Plan</h2>
 
-</section>
+            <p class="page-description">
+              Define your rules before entering the market.
+            </p>
+          </div>
 
+          <button class="primary-btn" id="savePlanBtn">
+            Save Plan
+          </button>
 
-<!-- CHECKLIST -->
+        </div>
 
-<section class="page" id="checklist">
 
-<div class="heading">
+        <div class="form-grid">
 
-<div>
-<h2>Pre-Trade Checklist</h2>
-<p>No trade until the conditions are satisfied.</p>
-</div>
+          <div class="panel">
 
-<button class="secondary" id="reset">
-Reset
-</button>
+            <div class="panel-header">
 
-</div>
+              <div>
+                <h3>Account & Risk</h3>
+                <p>Set your basic risk parameters.</p>
+              </div>
 
-<div class="panel">
+            </div>
 
-<div style="display:flex;justify-content:space-between">
 
-<strong>
-<span id="done">0</span> / 8
-</strong>
+            <div class="form-group">
 
-<strong id="percent">
-0%
-</strong>
+              <label for="planBalance">
+                Account Balance
+              </label>
 
-</div>
+              <input
+                type="number"
+                id="planBalance"
+                placeholder="1000"
+                step="0.01"
+              >
 
-<div class="progress">
-<div id="checkbar"></div>
-</div>
+            </div>
 
-<div id="checks"></div>
-
-<label class="check">
-<input type="checkbox">
-Higher timeframe context is clear.
-</label>
-
-<label class="check">
-<input type="checkbox">
-Price reached my planned zone.
-</label>
-
-<label class="check">
-<input type="checkbox">
-Liquidity setup makes sense.
-</label>
-
-<label class="check">
-<input type="checkbox">
-Market structure confirms my bias.
-</label>
-
-<label class="check">
-<input type="checkbox">
-Entry is at my planned level.
-</label>
-
-<label class="check">
-<input type="checkbox">
-Stop loss is technically valid.
-</label>
-
-<label class="check">
-<input type="checkbox">
-Risk is within my limit.
-</label>
-
-<label class="check">
-<input type="checkbox">
-R:R meets my minimum requirement.
-</label>
 
-</div>
+            <div class="form-row">
 
-<div class="gate bad" id="tradeGate">
+              <div class="form-group">
 
-<strong>🔴 TRADE BLOCKED</strong>
+                <label for="planRisk">
+                  Risk Per Trade (%)
+                </label>
 
-<p>
-Complete the checklist before entering.
-</p>
+                <input
+                  type="number"
+                  id="planRisk"
+                  placeholder="1"
+                  min="0"
+                  step="0.1"
+                >
 
-</div>
+              </div>
 
-<button class="primary" style="width:100%;margin-top:18px" id="calculatorButton">
-Continue to Risk Calculator
-</button>
 
-</div>
+              <div class="form-group">
 
-</section>
+                <label for="planMaxTrades">
+                  Max Trades / Day
+                </label>
 
+                <input
+                  type="number"
+                  id="planMaxTrades"
+                  placeholder="3"
+                  min="1"
+                >
 
-<!-- CALCULATOR -->
+              </div>
 
-<section class="page" id="calculator">
+            </div>
 
-<div class="heading">
 
-<div>
-<h2>Risk Calculator</h2>
-<p>Calculate risk before executing.</p>
-</div>
+            <div class="form-row">
 
-</div>
+              <div class="form-group">
 
-<div class="panel">
+                <label for="planMinRR">
+                  Minimum R:R
+                </label>
 
-<div class="formgrid">
+                <input
+                  type="number"
+                  id="planMinRR"
+                  placeholder="2"
+                  min="0.1"
+                  step="0.1"
+                >
 
-<label>
-Account Balance
-<input type="number" id="cbalance" value="10000">
-</label>
+              </div>
 
-<label>
-Risk %
-<input type="number" id="crisk" value="1" step="0.1">
-</label>
 
-<label>
-Pair
-<input id="pair" value="EURUSD">
-</label>
+              <div class="form-group">
 
-<label>
-Entry
-<input type="number" id="entry" step="0.00001">
-</label>
+                <label for="planDailyLoss">
+                  Daily Loss Limit (%)
+                </label>
 
-<label>
-Stop Loss
-<input type="number" id="stop" step="0.00001">
-</label>
+                <input
+                  type="number"
+                  id="planDailyLoss"
+                  placeholder="3"
+                  min="0"
+                  step="0.1"
+                >
 
-<label>
-Take Profit
-<input type="number" id="target" step="0.00001">
-</label>
+              </div>
 
-</div>
+            </div>
 
-<button class="primary" id="calculate">
-Calculate
-</button>
+          </div>
 
-<div class="results">
 
-<div class="result">
-<span>Money Risk</span>
-<strong id="rrisk">$0</strong>
-</div>
+          <div class="panel">
 
-<div class="result">
-<span>Stop Distance</span>
-<strong id="pips">0 pips</strong>
-</div>
+            <div class="panel-header">
 
-<div class="result">
-<span>R:R</span>
-<strong id="rr">0R</strong>
-</div>
+              <div>
+                <h3>Market Execution</h3>
+                <p>Define your preferred setup.</p>
+              </div>
 
-<div class="result">
-<span>Potential Profit</span>
-<strong id="profit">$0</strong>
-</div>
+            </div>
 
-<div class="result">
-<span>Estimated Lots</span>
-<strong id="lots">0</strong>
-</div>
 
-<div class="result">
-<span>Status</span>
-<strong id="status">—</strong>
-</div>
+            <div class="form-row">
 
-</div>
+              <div class="form-group">
 
-</div>
+                <label for="higherTimeframe">
+                  Higher Timeframe
+                </label>
 
-</section>
+                <select id="higherTimeframe">
 
+                  <option value="D1">D1</option>
+                  <option value="H4">H4</option>
+                  <option value="H1" selected>H1</option>
+                  <option value="M30">M30</option>
+                  <option value="M15">M15</option>
 
-<!-- JOURNAL -->
+                </select>
 
-<section class="page" id="journal">
+              </div>
 
-<div class="heading">
 
-<div>
-<h2>Trade Journal</h2>
-<p>Record every execution.</p>
-</div>
+              <div class="form-group">
 
-<button class="primary" id="add">
-+ Add Trade
-</button>
+                <label for="entryTimeframe">
+                  Entry Timeframe
+                </label>
 
-</div>
+                <select id="entryTimeframe">
 
-<div class="cards">
+                  <option value="M15">M15</option>
+                  <option value="M5" selected>M5</option>
+                  <option value="M1">M1</option>
 
-<div class="card">
-<span>Total Trades</span>
-<strong id="jt">0</strong>
-</div>
+                </select>
 
-<div class="card">
-<span>Wins</span>
-<strong id="jw">0</strong>
-</div>
+              </div>
 
-<div class="card">
-<span>Losses</span>
-<strong id="jl">0</strong>
-</div>
+            </div>
 
-<div class="card">
-<span>Net R</span>
-<strong id="jn">0R</strong>
-</div>
 
-</div>
+            <div class="form-group">
 
-<div class="panel">
+              <label for="tradingSession">
+                Preferred Session
+              </label>
 
-<table>
+              <select id="tradingSession">
 
-<thead>
+                <option value="London">London</option>
+                <option value="New York">New York</option>
+                <option value="London + New York">
+                  London + New York
+                </option>
+                <option value="Asia">Asia</option>
+                <option value="All Sessions">
+                  All Sessions
+                </option>
 
-<tr>
-<th>Date</th>
-<th>Pair</th>
-<th>Direction</th>
-<th>Result</th>
-<th>R</th>
-<th>P/L</th>
-<th>Action</th>
-</tr>
+              </select>
 
-</thead>
+            </div>
 
-<tbody id="journalbody">
 
-<tr>
-<td colspan="7" class="empty">
-No trades yet.
-</td>
-</tr>
+            <div class="form-group">
 
-</tbody>
+              <label for="strategy">
+                Main Strategy
+              </label>
 
-</table>
+              <input
+                type="text"
+                id="strategy"
+                placeholder="Market Structure + Liquidity + FVG"
+              >
 
-</div>
+            </div>
 
-</section>
+          </div>
 
 
-<!-- ANALYTICS -->
+          <div class="panel full-width">
 
-<section class="page" id="analytics">
+            <div class="panel-header">
 
-<div class="heading">
+              <div>
+                <h3>Trading Rules</h3>
+                <p>
+                  Write the rules you must follow before
+                  entering a trade.
+                </p>
+              </div>
 
-<div>
-<h2>Analytics</h2>
-<p>Measure your execution.</p>
-</div>
+            </div>
 
-</div>
 
-<div class="cards">
+            <div class="form-group">
 
-<div class="card">
-<span>Win Rate</span>
-<strong id="awin">0%</strong>
-</div>
+              <label for="tradingRules">
+                My Rules
+              </label>
 
-<div class="card">
-<span>Average R</span>
-<strong id="avg">0R</strong>
-</div>
+              <textarea
+                id="tradingRules"
+                rows="8"
+                placeholder="Example:
+1. Identify higher timeframe bias.
+2. Wait for liquidity sweep.
+3. Confirm market structure shift.
+4. Look for FVG / Order Block.
+5. Confirm VWAP.
+6. Minimum 1:2 R:R.
+7. Never risk more than 1%."
+              ></textarea>
 
-<div class="card">
-<span>Profit Factor</span>
-<strong id="pf">0</strong>
-</div>
+            </div>
 
-<div class="card">
-<span>Net R</span>
-<strong id="anetr">0R</strong>
-</div>
+          </div>
 
-</div>
+        </div>
 
-<div class="panel">
+      </section>
 
-<h3>Performance</h3>
 
-<p>
-Win Rate:
-<strong id="awin2">0%</strong>
-</p>
+      <!-- ================= PRE-TRADE CHECKLIST ================= -->
 
-<div class="progress">
-<div id="winbar"></div>
-</div>
+      <section id="checklist" class="page-section">
 
-<p>Process Discipline</p>
+        <div class="page-header">
 
-<div class="progress">
-<div style="width:100%"></div>
-</div>
+          <div>
+            <p class="eyebrow">DISCIPLINE</p>
+            <h2>Pre-Trade Checklist</h2>
 
-</div>
+            <p class="page-description">
+              Complete your checklist before taking a trade.
+            </p>
+          </div>
 
-</section>
+          <button class="secondary-btn" id="resetChecklistBtn">
+            Reset Checklist
+          </button>
 
+        </div>
 
-<!-- SETTINGS -->
 
-<section class="page" id="settings">
+        <div class="panel checklist-panel">
 
-<div class="heading">
+          <div class="checklist-progress">
 
-<div>
-<h2>Settings</h2>
-<p>Configure your trading limits.</p>
-</div>
+            <div class="progress-info">
 
-<button class="primary" id="saveSettings">
-Save Settings
-</button>
+              <span>Checklist Progress</span>
 
-</div>
+              <strong id="checklistPercentage">
+                0%
+              </strong>
 
-<div class="panel">
+            </div>
 
-<div class="formgrid">
+            <div class="progress-bar">
 
-<label>
-Account Balance
-<input type="number" id="sbalance" value="10000">
-</label>
+              <div
+                id="checklistProgressBar"
+                class="progress-fill"
+                style="width: 0%"
+              ></div>
 
-<label>
-Currency
+            </div>
 
-<select id="currency">
-<option selected>USD</option>
-<option>PHP</option>
-<option>EUR</option>
-<option>GBP</option>
-</select>
+          </div>
 
-</label>
 
-<label>
-Risk per Trade %
-<input type="number" id="srisk" value="1" step="0.1">
-</label>
+          <div id="checklistItems" class="checklist-items">
 
-<label>
-Maximum Trades / Day
-<input type="number" id="smax" value="3">
-</label>
+            <label class="check-item">
 
-<label>
-Daily Loss Limit
-<input type="number" id="slimit" value="200">
-</label>
+              <input
+                type="checkbox"
+                data-check="1"
+              >
 
-<label>
-Minimum R:R
-<input type="number" id="srr" value="2" step="0.1">
-</label>
+              <span>
+                Higher timeframe market bias is clear
+              </span>
 
-</div>
+            </label>
 
-</div>
 
-<div class="panel">
+            <label class="check-item">
 
-<h3>Data</h3>
+              <input
+                type="checkbox"
+                data-check="2"
+              >
 
-<p style="color:#8c98a8">
-Your data is stored locally in this browser.
-</p>
+              <span>
+                Important liquidity has been identified
+              </span>
 
-<button class="secondary" id="export">
-Export Backup
-</button>
+            </label>
 
-<button class="danger" id="clear">
-Clear All Data
-</button>
 
-</div>
+            <label class="check-item">
 
-</section>
+              <input
+                type="checkbox"
+                data-check="3"
+              >
 
-</div>
+              <span>
+                Liquidity sweep has occurred
+              </span>
 
-</main>
+            </label>
 
-</div>
 
+            <label class="check-item">
 
-<!-- TRADE MODAL -->
+              <input
+                type="checkbox"
+                data-check="4"
+              >
 
-<div class="modal" id="modal">
+              <span>
+                Market structure confirms the direction
+              </span>
 
-<div class="modalbox">
+            </label>
 
-<div class="modalhead">
 
-<div>
-<h2>Add Trade</h2>
-<p style="color:#8c98a8">
-Record your execution.
-</p>
-</div>
+            <label class="check-item">
 
-<button class="close" id="close">
-×
-</button>
+              <input
+                type="checkbox"
+                data-check="5"
+              >
 
-</div>
+              <span>
+                Supply / Demand or Order Block is valid
+              </span>
 
-<form id="tradeform">
+            </label>
 
-<div class="formgrid">
 
-<label>
-Pair
-<input id="tPair" value="EURUSD" required>
-</label>
+            <label class="check-item">
 
-<label>
-Direction
+              <input
+                type="checkbox"
+                data-check="6"
+              >
 
-<select id="tDirection">
-<option>BUY</option>
-<option>SELL</option>
-</select>
+              <span>
+                FVG / entry zone is confirmed
+              </span>
 
-</label>
+            </label>
 
-<label>
-Result
 
-<select id="tResult">
-<option>WIN</option>
-<option>LOSS</option>
-<option>BREAKEVEN</option>
-</select>
+            <label class="check-item">
 
-</label>
+              <input
+                type="checkbox"
+                data-check="7"
+              >
 
-<label>
-R
-<input type="number" id="tR" step="0.01" required>
-</label>
+              <span>
+                VWAP / volume confirmation is present
+              </span>
 
-<label>
-P/L
-<input type="number" id="tPL" step="0.01" required>
-</label>
+            </label>
 
-</div>
+
+            <label class="check-item">
+
+              <input
+                type="checkbox"
+                data-check="8"
+              >
+
+              <span>
+                Risk and R:R meet my trading plan
+              </span>
+
+            </label>
+
+          </div>
+
+
+          <div id="checklistStatus" class="checklist-status">
+            Complete the checklist before entering.
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ================= RISK CALCULATOR ================= -->
+
+      <section id="calculator" class="page-section">
+
+        <div class="page-header">
+
+          <div>
+            <p class="eyebrow">RISK MANAGEMENT</p>
+            <h2>Risk Calculator</h2>
+
+            <p class="page-description">
+              Calculate your trade risk before entering.
+            </p>
+          </div>
+
+        </div>
+
+
+        <div class="calculator-grid">
+
+          <div class="panel">
+
+            <div class="panel-header">
+
+              <div>
+                <h3>Trade Parameters</h3>
+                <p>Enter your trade information.</p>
+              </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label for="calcBalance">
+                Account Balance
+              </label>
+
+              <input
+                type="number"
+                id="calcBalance"
+                value="1000"
+                step="0.01"
+              >
+
+            </div>
+
+
+            <div class="form-row">
+
+              <div class="form-group">
+
+                <label for="calcRisk">
+                  Risk %
+                </label>
+
+                <input
+                  type="number"
+                  id="calcRisk"
+                  value="1"
+                  min="0"
+                  step="0.1"
+                >
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label for="calcRR">
+                  Target R:R
+                </label>
+
+                <input
+                  type="number"
+                  id="calcRR"
+                  value="2"
+                  min="0.1"
+                  step="0.1"
+                >
+
+              </div>
+
+            </div>
+
+
+            <div class="form-row">
+
+              <div class="form-group">
+
+                <label for="calcEntry">
+                  Entry Price
+                </label>
+
+                <input
+                  type="number"
+                  id="calcEntry"
+                  placeholder="1.16500"
+                  step="0.00001"
+                >
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label for="calcStop">
+                  Stop Loss
+                </label>
+
+                <input
+                  type="number"
+                  id="calcStop"
+                  placeholder="1.16300"
+                  step="0.00001"
+                >
+
+              </div>
+
+            </div>
+
+
+            <button
+              class="primary-btn full-btn"
+              id="calculateRiskBtn"
+            >
+              Calculate Risk
+            </button>
+
+          </div>
+
+
+          <div class="panel calculator-results">
+
+            <div class="panel-header">
+
+              <div>
+                <h3>Calculation</h3>
+                <p>Your estimated trade risk.</p>
+              </div>
+
+            </div>
+
+
+            <div class="result-grid">
+
+              <div class="result-card">
+                <span>Money at Risk</span>
+                <strong id="resultRisk">$0.00</strong>
+              </div>
+
+              <div class="result-card">
+                <span>Stop Distance</span>
+                <strong id="resultDistance">0 pips</strong>
+              </div>
+
+              <div class="result-card">
+                <span>Potential Profit</span>
+                <strong id="resultProfit">$0.00</strong>
+              </div>
+
+              <div class="result-card">
+                <span>Target R:R</span>
+                <strong id="resultRR">1:0</strong>
+              </div>
+
+            </div>
+
+
+            <div class="calculator-note">
+
+              <strong>Note</strong>
+
+              <p>
+                This calculator estimates risk using the
+                entered price distance. Actual position size
+                depends on the instrument and pip value.
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+  </section>
+        <!-- ================= TRADE JOURNAL ================= -->
+
+      <section id="journal" class="page-section">
+
+        <div class="page-header">
+
+          <div>
+            <p class="eyebrow">TRADE HISTORY</p>
+            <h2>Trade Journal</h2>
+
+            <p class="page-description">
+              Record, review and improve every trade.
+            </p>
+          </div>
+
+          <button class="primary-btn" id="addTradeBtn">
+            + Add Trade
+          </button>
+
+        </div>
+
+
+        <!-- JOURNAL FILTERS -->
+
+        <div class="panel journal-toolbar">
+
+          <div class="search-box">
+
+            <span>🔍</span>
+
+            <input
+              type="text"
+              id="journalSearch"
+              placeholder="Search pair, setup or notes..."
+            >
+
+          </div>
+
+
+          <select id="journalResultFilter">
+
+            <option value="all">All Results</option>
+            <option value="win">Wins</option>
+            <option value="loss">Losses</option>
+            <option value="breakeven">Breakeven</option>
+
+          </select>
+
+
+          <button
+            class="secondary-btn"
+            id="clearJournalFiltersBtn"
+          >
+            Clear Filters
+          </button>
+
+        </div>
+
+
+        <!-- JOURNAL LIST -->
+
+        <div id="journalList" class="journal-list">
+
+          <div class="empty-state">
+
+            <div class="empty-icon">📓</div>
+
+            <h4>Your journal is empty</h4>
+
+            <p>
+              Add a trade and start building your trading history.
+            </p>
+
+            <button
+              class="primary-btn"
+              id="journalEmptyAddBtn"
+            >
+              + Add Trade
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ================= ANALYTICS ================= -->
+
+      <section id="analytics" class="page-section">
+
+        <div class="page-header">
+
+          <div>
+            <p class="eyebrow">PERFORMANCE</p>
+            <h2>Analytics</h2>
+
+            <p class="page-description">
+              Understand your trading performance.
+            </p>
+          </div>
+
+        </div>
+
+
+        <div class="stats-grid">
+
+          <div class="stat-card">
+
+            <div class="stat-icon">🎯</div>
+
+            <div>
+              <span>Win Rate</span>
+              <strong id="analyticsWinRate">0%</strong>
+            </div>
+
+          </div>
+
+
+          <div class="stat-card">
+
+            <div class="stat-icon">📊</div>
+
+            <div>
+              <span>Total Trades</span>
+              <strong id="analyticsTrades">0</strong>
+            </div>
+
+          </div>
+
+
+          <div class="stat-card">
+
+            <div class="stat-icon">📈</div>
+
+            <div>
+              <span>Average R</span>
+              <strong id="analyticsAverageR">0R</strong>
+            </div>
+
+          </div>
+
+
+          <div class="stat-card">
+
+            <div class="stat-icon">💰</div>
+
+            <div>
+              <span>Net P/L</span>
+              <strong id="analyticsProfit">$0.00</strong>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="analytics-grid">
+
+          <div class="panel">
+
+            <div class="panel-header">
+
+              <div>
+                <h3>Performance Summary</h3>
+                <p>Based on your saved trades.</p>
+              </div>
+
+            </div>
+
+
+            <div class="analytics-list">
+
+              <div class="analytics-row">
+                <span>Winning Trades</span>
+                <strong id="analyticsWins">0</strong>
+              </div>
+
+              <div class="analytics-row">
+                <span>Losing Trades</span>
+                <strong id="analyticsLosses">0</strong>
+              </div>
+
+              <div class="analytics-row">
+                <span>Breakeven Trades</span>
+                <strong id="analyticsBreakeven">0</strong>
+              </div>
+
+              <div class="analytics-row">
+                <span>Total R</span>
+                <strong id="analyticsTotalR">0R</strong>
+              </div>
+
+              <div class="analytics-row">
+                <span>Best Trade</span>
+                <strong id="analyticsBestTrade">0R</strong>
+              </div>
+
+              <div class="analytics-row">
+                <span>Worst Trade</span>
+                <strong id="analyticsWorstTrade">0R</strong>
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div class="panel">
+
+            <div class="panel-header">
+
+              <div>
+                <h3>Result Distribution</h3>
+                <p>Win, loss and breakeven ratio.</p>
+              </div>
+
+            </div>
+
+
+            <div class="distribution">
+
+              <div class="distribution-item">
+
+                <div class="distribution-label">
+                  <span>Wins</span>
+                  <strong id="distributionWinPercent">
+                    0%
+                  </strong>
+                </div>
+
+                <div class="distribution-bar">
+                  <div
+                    id="distributionWinBar"
+                    class="distribution-fill win"
+                    style="width:0%"
+                  ></div>
+                </div>
+
+              </div>
+
+
+              <div class="distribution-item">
+
+                <div class="distribution-label">
+                  <span>Losses</span>
+                  <strong id="distributionLossPercent">
+                    0%
+                  </strong>
+                </div>
+
+                <div class="distribution-bar">
+                  <div
+                    id="distributionLossBar"
+                    class="distribution-fill loss"
+                    style="width:0%"
+                  ></div>
+                </div>
+
+              </div>
+
+
+              <div class="distribution-item">
+
+                <div class="distribution-label">
+                  <span>Breakeven</span>
+                  <strong id="distributionBreakevenPercent">
+                    0%
+                  </strong>
+                </div>
+
+                <div class="distribution-bar">
+                  <div
+                    id="distributionBreakevenBar"
+                    class="distribution-fill breakeven"
+                    style="width:0%"
+                  ></div>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ================= SETTINGS ================= -->
+
+      <section id="settings" class="page-section">
+
+        <div class="page-header">
+
+          <div>
+            <p class="eyebrow">CONFIGURATION</p>
+            <h2>Settings</h2>
+
+            <p class="page-description">
+              Configure your TradingEdge workspace.
+            </p>
+          </div>
+
+          <button
+            class="primary-btn"
+            id="saveSettingsBtn"
+          >
+            Save Settings
+          </button>
+
+        </div>
+
+
+        <div class="form-grid">
+
+          <div class="panel">
+
+            <div class="panel-header">
+
+              <div>
+                <h3>Account Settings</h3>
+                <p>Your account information.</p>
+              </div>
+
+            </div>
+
 
-<label>
-Setup
-<input id="tSetup" placeholder="Supply + Liquidity" required>
-</label>
-<label>
-  Chart Screenshot
-  <input type="file" id="tScreenshot" accept="image/*">
-</label>
-
-<div id="screenshotPreview"></div>
-<label>
-Notes
-<textarea id="tNotes"></textarea>
-</label>
-
-<button class="primary" type="submit">
-Save Trade
-</button>
+            <div class="form-group">
+
+              <label for="settingsBalance">
+                Account Balance
+              </label>
+
+              <input
+                type="number"
+                id="settingsBalance"
+                step="0.01"
+              >
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label for="settingsCurrency">
+                Currency
+              </label>
+
+              <select id="settingsCurrency">
+
+                <option value="USD">USD - US Dollar</option>
+                <option value="PHP">PHP - Philippine Peso</option>
+                <option value="EUR">EUR - Euro</option>
+                <option value="GBP">GBP - British Pound</option>
+
+              </select>
+
+            </div>
+
+          </div>
+
+
+          <div class="panel">
+
+            <div class="panel-header">
+
+              <div>
+                <h3>Risk Settings</h3>
+                <p>Default risk management rules.</p>
+              </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label for="settingsRisk">
+                Default Risk Per Trade (%)
+              </label>
+
+              <input
+                type="number"
+                id="settingsRisk"
+                min="0"
+                step="0.1"
+              >
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label for="settingsMaxTrades">
+                Maximum Trades Per Day
+              </label>
+
+              <input
+                type="number"
+                id="settingsMaxTrades"
+                min="1"
+              >
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label for="settingsDailyLoss">
+                Daily Loss Limit (%)
+              </label>
+
+              <input
+                type="number"
+                id="settingsDailyLoss"
+                min="0"
+                step="0.1"
+              >
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label for="settingsMinRR">
+                Minimum R:R
+              </label>
+
+              <input
+                type="number"
+                id="settingsMinRR"
+                min="0.1"
+                step="0.1"
+              >
+
+            </div>
+
+          </div>
+
+
+          <div class="panel full-width">
+
+            <div class="panel-header">
+
+              <div>
+                <h3>Data Management</h3>
+                <p>
+                  Protect and manage your journal data.
+                </p>
+              </div>
+
+            </div>
+
+
+            <div class="data-actions">
+
+              <button
+                class="secondary-btn"
+                id="settingsExportBtn"
+              >
+                📤 Export Backup
+              </button>
+
+
+              <button
+                class="secondary-btn"
+                id="settingsImportBtn"
+              >
+                📥 Import Backup
+              </button>
+
+
+              <button
+                class="danger-btn"
+                id="clearAllDataBtn"
+              >
+                🗑 Clear All Data
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+    </main>
+
+  </div>
+
+
+  <!-- =====================================================
+       ADD / EDIT TRADE MODAL
+       ===================================================== -->
+
+  <div
+    id="tradeModal"
+    class="modal"
+    aria-hidden="true"
+  >
+
+    <div class="modal-overlay" id="modalOverlay"></div>
+
+
+    <div class="modal-content">
+
+      <div class="modal-header">
+
+        <div>
+
+          <p class="eyebrow">
+            TRADE JOURNAL
+          </p>
+
+          <h2 id="tradeModalTitle">
+            Add Trade
+          </h2>
+
+        </div>
+
+
+        <button
+          class="modal-close"
+          id="closeTradeModalBtn"
+          aria-label="Close"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <form id="tradeForm">
+
+        <input
+          type="hidden"
+          id="tradeId"
+        >
+
+
+        <!-- BASIC INFORMATION -->
+
+        <div class="modal-section">
+
+          <h3>Trade Information</h3>
+
+
+          <div class="form-row">
+
+            <div class="form-group">
+
+              <label for="tradePair">
+                Pair / Instrument *
+              </label>
+
+              <input
+                type="text"
+                id="tradePair"
+                placeholder="EUR/USD"
+                required
+              >
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label for="tradeDirection">
+                Direction *
+              </label>
+
+              <select id="tradeDirection" required>
+
+                <option value="BUY">
+                  BUY
+                </option>
+
+                <option value="SELL">
+                  SELL
+                </option>
+
+              </select>
+
+            </div>
+
+          </div>
+
+
+          <div class="form-row">
+
+            <div class="form-group">
+
+              <label for="tradeDate">
+                Date *
+              </label>
+
+              <input
+                type="date"
+                id="tradeDate"
+                required
+              >
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label for="tradeSession">
+                Session
+              </label>
+
+              <select id="tradeSession">
+
+                <option value="London">
+                  London
+                </option>
+
+                <option value="New York">
+                  New York
+                </option>
+
+                <option value="London + New York">
+                  London + New York
+                </option>
+
+                <option value="Asia">
+                  Asia
+                </option>
+
+                <option value="Other">
+                  Other
+                </option>
+
+              </select>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- PRICE INFORMATION -->
+
+        <div class="modal-section">
+
+          <h3>Price & Risk</h3>
+
+
+          <div class="form-row">
+
+            <div class="form-group">
+
+              <label for="tradeEntry">
+                Entry
+              </label>
+
+              <input
+                type="number"
+                id="tradeEntry"
+                step="0.00001"
+              >
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label for="tradeStop">
+                Stop Loss
+              </label>
+
+              <input
+                type="number"
+                id="tradeStop"
+                step="0.00001"
+              >
+
+            </div>
+
+          </div>
+
+
+          <div class="form-row">
+
+            <div class="form-group">
+
+              <label for="tradeTakeProfit">
+                Take Profit
+              </label>
+
+              <input
+                type="number"
+                id="tradeTakeProfit"
+                step="0.00001"
+              >
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label for="tradeLotSize">
+                Lot Size
+              </label>
+
+              <input
+                type="number"
+                id="tradeLotSize"
+                step="0.01"
+                min="0"
+              >
+
+            </div>
+
+          </div>
+
+
+          <div class="form-row">
+
+            <div class="form-group">
+
+              <label for="tradeRiskPercent">
+                Risk %
+              </label>
+
+              <input
+                type="number"
+                id="tradeRiskPercent"
+                step="0.1"
+                min="0"
+              >
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label for="tradeRMultiple">
+                Result (R)
+              </label>
+
+              <input
+                type="number"
+                id="tradeRMultiple"
+                step="0.1"
+                placeholder="Example: 2"
+              >
+
+            </div>
+
+          </div>
+
+
+          <div class="form-row">
+
+            <div class="form-group">
+
+              <label for="tradeProfitLoss">
+                Profit / Loss
+              </label>
+
+              <input
+                type="number"
+                id="tradeProfitLoss"
+                step="0.01"
+                placeholder="Example: 100 or -50"
+              >
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label for="tradeResult">
+                Result
+              </label>
+
+              <select id="tradeResult">
+
+                <option value="win">
+                  Win
+                </option>
+
+                <option value="loss">
+                  Loss
+                </option>
+
+                <option value="breakeven">
+                  Breakeven
+                </option>
+
+              </select>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- STRATEGY -->
+
+        <div class="modal-section">
+
+          <h3>Strategy Analysis</h3>
+
+
+          <div class="strategy-check-grid">
+
+            <label class="strategy-check">
+
+              <input
+                type="checkbox"
+                id="tradeMarketStructure"
+              >
+
+              <span>Market Structure</span>
+
+            </label>
+
+
+            <label class="strategy-check">
+
+              <input
+                type="checkbox"
+                id="tradeLiquiditySweep"
+              >
+
+              <span>Liquidity Sweep</span>
+
+            </label>
+
+
+            <label class="strategy-check">
+
+              <input
+                type="checkbox"
+                id="tradeSupplyDemand"
+              >
+
+              <span>Supply / Demand</span>
+
+            </label>
+
+
+            <label class="strategy-check">
+
+              <input
+                type="checkbox"
+                id="tradeOrderBlock"
+              >
+
+              <span>Order Block</span>
+
+            </label>
+
+
+            <label class="strategy-check">
+
+              <input
+                type="checkbox"
+                id="tradeFVG"
+              >
+
+              <span>FVG</span>
+
+            </label>
+
+
+            <label class="strategy-check">
+
+              <input
+                type="checkbox"
+                id="tradeVWAP"
+              >
+
+              <span>VWAP</span>
+
+            </label>
+
+
+            <label class="strategy-check">
+
+              <input
+                type="checkbox"
+                id="tradeVolume"
+              >
+
+              <span>Volume</span>
+
+            </label>
+
+          </div>
+
+        </div>
+
+
+        <!-- SCREENSHOT -->
+
+        <div class="modal-section">
+
+          <h3>Chart Screenshot</h3>
+
+
+          <p class="section-help">
+            Upload your chart screenshot for this trade.
+          </p>
+
+
+          <input
+            type="file"
+            id="tradeScreenshot"
+            accept="image/*"
+            hidden
+          >
+
+
+          <button
+            type="button"
+            class="upload-box"
+            id="uploadScreenshotBtn"
+          >
+
+            <span class="upload-icon">📷</span>
+
+            <strong>
+              Upload Chart Screenshot
+            </strong>
+
+            <small>
+              JPG, PNG or WebP
+            </small>
+
+          </button>
+
+
+          <div
+            id="screenshotPreview"
+            class="screenshot-preview hidden"
+          >
+
+            <img
+              id="screenshotImage"
+              src=""
+              alt="Trade chart screenshot"
+            >
+
+
+            <div class="screenshot-actions">
+
+              <button
+                type="button"
+                class="secondary-btn"
+                id="replaceScreenshotBtn"
+              >
+                Replace
+              </button>
+
+
+              <button
+                type="button"
+                class="danger-btn"
+                id="removeScreenshotBtn"
+              >
+                Remove
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- NOTES -->
+
+        <div class="modal-section">
+
+          <h3>Trade Notes</h3>
+
+
+          <div class="form-group">
+
+            <label for="tradeSetup">
+              Setup / Entry Reason
+            </label>
+
+            <textarea
+              id="tradeSetup"
+              rows="4"
+              placeholder="Why did you take this trade?"
+            ></textarea>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="tradeNotes">
+              Notes / Lesson
+            </label>
+
+            <textarea
+              id="tradeNotes"
+              rows="5"
+              placeholder="What did you do well? What could be improved?"
+            ></textarea>
+
+          </div>
+
+        </div>
+
+
+        <!-- MODAL ACTIONS -->
+
+        <div class="modal-
+          <div class="modal-actions">
+
+  <button
+    type="button"
+    class="secondary-btn"
+    id="cancelTradeBtn"
+  >
+    Cancel
+  </button>
+
+  <button
+    type="submit"
+    class="primary-btn"
+  >
+    Save Trade
+  </button>
+
+</div>
 
 </form>
 
@@ -1198,649 +1945,66 @@ Save Trade
 </div>
 
 
-<div class="toast" id="toast"></div>
+<!-- =====================================================
+     IMAGE VIEWER
+     ===================================================== -->
 
+<div
+  id="imageViewer"
+  class="image-viewer"
+  aria-hidden="true"
+>
 
-<script>
-"use strict";
+  <div
+    class="image-viewer-overlay"
+    id="imageViewerOverlay"
+  ></div>
 
-(function(){
 
-const KEY="TRADINGEDGE_DATA";
+  <div class="image-viewer-content">
 
-const DEFAULT={
-settings:{
-balance:10000,
-currency:"USD",
-risk:1,
-max:3,
-limit:200,
-minRR:2
-},
-plan:{
-htf:"4H",
-entry:"15M",
-notes:"",
-rules:[true,true,true,true,true,true]
-},
-trades:[]
-};
+    <button
+      class="image-viewer-close"
+      id="closeImageViewerBtn"
+      type="button"
+    >
+      ×
+    </button>
 
-let data;
 
-try{
-data=JSON.parse(localStorage.getItem(KEY));
+    <img
+      id="fullScreenshotImage"
+      src=""
+      alt="Full trade screenshot"
+    >
 
-if(!data){
-data=JSON.parse(JSON.stringify(DEFAULT));
-}
+  </div>
 
-}catch(error){
-data=JSON.parse(JSON.stringify(DEFAULT));
-}
+</div>
 
-function $(id){
-return document.getElementById(id);
-}
 
-function save(){
-localStorage.setItem(KEY,JSON.stringify(data));
-update();
-}
+<!-- =====================================================
+     TOAST NOTIFICATION
+     ===================================================== -->
 
-function money(value){
+<div
+  id="toast"
+  class="toast"
+  aria-live="polite"
+>
 
-try{
-return new Intl.NumberFormat(undefined,{
-style:"currency",
-currency:data.settings.currency || "USD",
-maximumFractionDigits:2
-}).format(Number(value)||0);
-}catch(error){
-return "$"+(Number(value)||0).toFixed(2);
-}
+  <span id="toastIcon">✓</span>
 
-}
+  <span id="toastMessage">
+    Saved
+  </span>
 
-function toast(message){
+</div>
 
-$("toast").textContent=message;
 
-$("toast").classList.add("show");
+<!-- JAVASCRIPT -->
 
-setTimeout(function(){
-$("toast").classList.remove("show");
-},2200);
-
-}
-
-
-/* NAVIGATION */
-
-const pageNames={
-dashboard:"Dashboard",
-plan:"My Plan",
-checklist:"Pre-Trade",
-calculator:"Risk Calculator",
-journal:"Journal",
-analytics:"Analytics",
-settings:"Settings"
-};
-
-document.querySelectorAll(".nav").forEach(function(button){
-
-button.addEventListener("click",function(){
-
-const page=button.getAttribute("data-page");
-
-document.querySelectorAll(".page").forEach(function(section){
-section.classList.remove("active");
-});
-
-const target=$(page);
-
-if(target){
-target.classList.add("active");
-}
-
-document.querySelectorAll(".nav").forEach(function(item){
-item.classList.remove("active");
-});
-
-button.classList.add("active");
-
-$("title").textContent=pageNames[page];
-
-$("sidebar").classList.remove("open");
-
-window.scrollTo(0,0);
-
-});
-
-});
-
-
-$("menu").addEventListener("click",function(){
-$("sidebar").classList.toggle("open");
-});
-
-
-/* DATE */
-
-$("date").textContent=new Date().toLocaleDateString(undefined,{
-weekday:"long",
-year:"numeric",
-month:"long",
-day:"numeric"
-});
-
-
-/* CHECKLIST */
-
-const checks=document.querySelectorAll("#checks input");
-
-let completed=0;
-
-checks.forEach(function(check){
-
-if(check.checked){
-completed++;
-}
-
-});
-
-if(completed!==checks.length){
-
-toast("Complete the checklist first.");
-
-return;
-
-}
-
-document.querySelector('[data-page="calculator"]').click();
-
-});
-
-
-/* PLAN */
-function renderMyRules(){
-
-const container=$("myRules");
-
-if(!container)return;
-
-if(!Array.isArray(data.plan.rules)){
-data.plan.rules=[];
-}
-
-container.innerHTML="";
-
-data.plan.rules.forEach(function(rule,index){
-
-const box=document.createElement("div");
-
-box.style.display="flex";
-box.style.gap="8px";
-box.style.marginBottom="10px";
-
-box.innerHTML=
-'<input type="text" value="'+
-String(rule).replace(/"/g,"&quot;")+
-'" data-rule="'+index+'" style="flex:1">'+
-'<button class="danger" type="button" data-delete="'+index+'">Delete</button>';
-
-container.appendChild(box);
-
-});
-
-container.querySelectorAll("[data-delete]").forEach(function(button){
-
-button.addEventListener("click",function(){
-
-const index=Number(button.getAttribute("data-delete"));
-
-data.plan.rules.splice(index,1);
-
-renderMyRules();
-
-});
-
-});
-
-}
-
-$("addRule").addEventListener("click",function(){
-
-if(!Array.isArray(data.plan.rules)){
-data.plan.rules=[];
-}
-
-data.plan.rules.push("New trading rule");
-
-renderMyRules();
-
-});
-
-$("savePlan").addEventListener("click",function(){
-
-const rules=[];
-
-document.querySelectorAll("[data-rule]").forEach(function(input){
-
-const text=input.value.trim();
-
-if(text){
-rules.push(text);
-}
-
-});
-
-data.plan.htf=$("htf").value;
-data.plan.entry=$("entrytf").value;
-data.plan.notes=$("notes").value;
-data.plan.rules=rules;
-
-save();
-
-renderMyRules();
-
-toast("Trading plan saved.");
-
-});
-
-renderMyRules();
-
-
-
-/* SETTINGS */
-
-$("saveSettings").addEventListener("click",function(){
-
-data.settings.balance=Number($("sbalance").value)||10000;
-data.settings.currency=$("currency").value;
-data.settings.risk=Number($("srisk").value)||1;
-data.settings.max=Math.max(1,Number($("smax").value)||3);
-data.settings.limit=Math.max(0,Number($("slimit").value)||200);
-data.settings.minRR=Math.max(0,Number($("srr").value)||2);
-
-save();
-
-toast("Settings saved.");
-
-});
-
-
-$("calculate").addEventListener("click",function(){
-
-const balance=Number($("cbalance").value);
-const risk=Number($("crisk").value);
-const entry=Number($("entry").value);
-const stop=Number($("stop").value);
-const target=Number($("target").value);
-
-const pair=$("pair").value.trim().toUpperCase();
-
-if(!balance || !risk){
-toast("Enter balance and risk.");
-return;
-}
-
-const riskMoney=balance*risk/100;
-
-let pips=0;
-let rr=0;
-let lots=0;
-
-if(Number.isFinite(entry) && Number.isFinite(stop)){
-
-const pipSize=pair.includes("JPY") ? 0.01 : 0.0001;
-const distance=Math.abs(entry-stop);
-
-pips=distance/pipSize;
-
-if(Number.isFinite(target)){
-
-const targetDistance=Math.abs(target-entry);
-
-if(distance>0){
-rr=targetDistance/distance;
-}
-
-}
-
-if(pips>0){
-lots=riskMoney/(pips*10);
-}
-
-}
-
-$("rrisk").textContent=money(riskMoney);
-$("pips").textContent=pips.toFixed(1)+" pips";
-$("rr").textContent=rr.toFixed(2)+"R";
-$("profit").textContent=money(riskMoney*rr);
-$("lots").textContent=lots.toFixed(2);
-
-if(rr>=data.settings.minRR){
-
-$("status").textContent="VALID";
-$("status").style.color="#31d07c";
-
-}else{
-
-$("status").textContent="BELOW MIN R:R";
-$("status").style.color="#ff5d6c";
-
-}
-
-});
-
-
-$("add").addEventListener("click",function(){
-$("modal").classList.add("open");
-});
-
-$("close").addEventListener("click",function(){
-$("modal").classList.remove("open");
-});
-
-$("modal").addEventListener("click",function(event){
-
-if(event.target===this){
-this.classList.remove("open");
-}
-
-});
-
-
-$("tradeform").addEventListener("submit",async function(event){
-
-event.preventDefault();
-
-const trade={const screenshotFile=$("tScreenshot").files[0];
-
-let screenshot="";
-
-if(screenshotFile){
-
-screenshot=await new Promise(function(resolve){
-
-const reader=new FileReader();
-
-reader.onload=function(){
-resolve(reader.result);
-};
-
-reader.readAsDataURL(screenshotFile);
-
-});
-
-  }
-id:Date.now(),
-date:new Date().toISOString().slice(0,10),
-pair:$("tPair").value.trim().toUpperCase(),
-direction:$("tDirection").value,
-result:$("tResult").value,
-r:Number($("tR").value),
-pl:Number($("tPL").value),
-setup:$("tSetup").value.trim(),
-screenshot:screenshot,
-notes:$("tNotes").value.trim()
-};
-
-data.trades.push(trade);
-
-save();
-
-$("tradeform").reset();
-
-$("modal").classList.remove("open");
-
-toast("Trade saved.");
-
-});
-
-
-window.deleteTrade=function(id){
-
-if(!confirm("Delete this trade?")){
-return;
-}
-
-data.trades=data.trades.filter(function(trade){
-return String(trade.id)!==String(id);
-});
-
-save();
-
-toast("Trade deleted.");
-
-};
-
-
-function renderTrades(){
-
-const trades=[...data.trades].reverse();
-
-if(!trades.length){
-
-$("recent").innerHTML=
-'<tr><td colspan="6" class="empty">No trades recorded yet.</td></tr>';
-
-$("journalbody").innerHTML=
-'<tr><td colspan="7" class="empty">No trades yet.</td></tr>';
-
-return;
-
-}
-
-let recentHTML="";
-
-trades.slice(0,8).forEach(function(trade){
-
-const resultColor=
-trade.result==="WIN"
-?"#31d07c"
-:trade.result==="LOSS"
-?"#ff5d6c"
-:"#f2c94c";
-
-recentHTML+=
-"<tr>"+
-"<td>"+trade.date+"</td>"+
-"<td>"+trade.pair+"</td>"+
-"<td>"+trade.direction+"</td>"+
-"<td style='color:"+resultColor+"'>"+trade.result+"</td>"+
-"<td>"+Number(trade.r).toFixed(2)+"R</td>"+
-"<td>"+money(trade.pl)+"</td>"+
-"</tr>";
-
-});
-
-$("recent").innerHTML=recentHTML;
-
-let journalHTML="";
-const image=trade.screenshot
-?'<img src="'+trade.screenshot+'" style="width:100px;border-radius:6px">'
-:"No screenshot";
-trades.forEach(function(trade){
-
-const resultColor=
-trade.result==="WIN"
-?"#31d07c"
-:trade.result==="LOSS"
-?"#ff5d6c"
-:"#f2c94c";
-
-journalHTML+=
-"<tr>"+
-"<td>"+trade.date+"</td>"+
-"<td>"+trade.pair+"</td>"+
-"<td>"+trade.direction+"</td>"+
-"<td style='color:"+resultColor+"'>"+trade.result+"</td>"+
-"<td>"+Number(trade.r).toFixed(2)+"R</td>"+
-"<td>"+money(trade.pl)+"</td>"+
-"<td><button class='danger' onclick='deleteTrade(\""+trade.id+"\")'>Delete</button></td>"+
-"</tr>";
-
-});
-
-$("journalbody").innerHTML=journalHTML;
-
-}
-
-
-function update(){
-
-const trades=data.trades;
-
-const totalPL=trades.reduce(function(sum,trade){
-return sum+(Number(trade.pl)||0);
-},0);
-
-const wins=trades.filter(function(trade){
-return trade.result==="WIN";
-}).length;
-
-const losses=trades.filter(function(trade){
-return trade.result==="LOSS";
-}).length;
-
-const winRate=trades.length
-?(wins/trades.length)*100
-:0;
-
-$("balance").textContent=money(data.settings.balance);
-$("pnl").textContent=money(totalPL);
-$("winrate").textContent=winRate.toFixed(1)+"%";
-$("tradeCount").textContent=trades.length;
-
-const todayString=new Date().toISOString().slice(0,10);
-
-const todayTrades=trades.filter(function(trade){
-return trade.date===todayString;
-});
-
-const todayLoss=todayTrades.reduce(function(sum,trade){
-
-const pl=Number(trade.pl)||0;
-
-return sum+(pl<0?Math.abs(pl):0);
-
-},0);
-
-$("today").textContent=todayTrades.length;
-$("maxTrades").textContent=data.settings.max;
-$("loss").textContent=todayLoss.toFixed(2);
-$("lossLimit").textContent=data.settings.limit;
-
-$("tradebar").style.width=
-Math.min(100,(todayTrades.length/data.settings.max)*100)+"%";
-
-$("lossbar").style.width=
-data.settings.limit>0
-?Math.min(100,(todayLoss/data.settings.limit)*100)+"%"
-:"0%";
-
-if(
-todayTrades.length>=data.settings.max ||
-todayLoss>=data.settings.limit
-){
-
-$("dashboardGate").className="gate bad";
-
-$("dashboardGate").innerHTML=
-"<strong>🔴 TRADING LOCKED</strong>"+
-"<p>Your daily trading limit has been reached.</p>";
-
-}else{
-
-$("dashboardGate").className="gate ok";
-
-$("dashboardGate").innerHTML=
-"<strong>🟢 TRADING AVAILABLE</strong>"+
-"<p>You may begin your pre-trade checklist.</p>";
-
-}
-
-$("jt").textContent=trades.length;
-$("jw").textContent=wins;
-$("jl").textContent=losses;
-
-const netR=trades.reduce(function(sum,trade){
-return sum+(Number(trade.r)||0);
-},0);
-
-$("jn").textContent=(netR>=0?"+":"")+netR.toFixed(2)+"R";
-
-$("awin").textContent=winRate.toFixed(1)+"%";
-$("awin2").textContent=winRate.toFixed(1)+"%";
-$("winbar").style.width=Math.min(100,winRate)+"%";
-
-const averageR=trades.length
-?netR/trades.length
-:0;
-
-$("avg").textContent=
-(averageR>=0?"+":"")+averageR.toFixed(2)+"R";
-
-$("anetr").textContent=
-(netR>=0?"+":"")+netR.toFixed(2)+"R";
-
-const grossProfit=trades.reduce(function(sum,trade){
-
-const pl=Number(trade.pl)||0;
-
-return sum+(pl>0?pl:0);
-
-},0);
-
-const grossLoss=trades.reduce(function(sum,trade){
-
-const pl=Number(trade.pl)||0;
-
-return sum+(pl<0?Math.abs(pl):0);
-
-},0);
-
-$("pf").textContent=
-grossLoss>0
-?(grossProfit/grossLoss).toFixed(2)
-:grossProfit>0
-?"∞"
-:"0";
-
-renderTrades();
-
-}
-
-
-$("sbalance").value=data.settings.balance;
-$("currency").value=data.settings.currency;
-$("srisk").value=data.settings.risk;
-$("smax").value=data.settings.max;
-$("slimit").value=data.settings.limit;
-$("srr").value=data.settings.minRR;
-
-$("cbalance").value=data.settings.balance;
-$("crisk").value=data.settings.risk;
-
-$("htf").value=data.plan.htf;
-$("entrytf").value=data.plan.entry;
-$("notes").value=data.plan.notes || "";
-
-document.querySelectorAll(".planrule").forEach(function(rule,index){
-
-if(Array.isArray(data.plan.rules)){
-rule.checked=data.plan.rules[index]!==false;
-}
-
-});
-
-update();
-updateChecklist();
-
-})();
-</script>
+<script src="app.js"></script>
 
 </body>
-</html>
+  </html>
