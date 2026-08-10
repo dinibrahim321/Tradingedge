@@ -3,207 +3,703 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EdgeFlo | Institutional Forex Execution Hub</title>
+  <meta name="theme-color" content="#080b12" />
+  <title>TradeFlow — Trading Journal</title>
   <link rel="stylesheet" href="styles.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 </head>
-<body>
 
-  <!-- Top Institutional Ticker Bar -->
-  <div class="ticker-bar">
-    <div class="tradingview-widget-container">
-      <div class="tradingview-widget-container__widget"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
-      {
-        "symbols": [
-          { "proName": "FX_IDC:EURUSD", "title": "EUR/USD" },
-          { "proName": "FX_IDC:GBPUSD", "title": "GBP/USD" },
-          { "proName": "FX_IDC:USDJPY", "title": "USD/JPY" },
-          { "proName": "CAPITALCOM:DXY", "title": "DXY Index" }
-        ],
-        "showSymbolLogo": true,
-        "colorTheme": "dark",
-        "isTransparent": true,
-        "displayMode": "adaptive",
-        "locale": "en"
-      }
-      </script>
+<body>
+  <div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark">T</div>
+        <div>
+          <strong>TradeFlow</strong>
+          <span>Trading Journal</span>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-item active" data-page="dashboard">
+          <span>⌂</span> Dashboard
+        </button>
+
+        <button class="nav-item" data-page="journal">
+          <span>▤</span> Journal
+        </button>
+
+        <button class="nav-item" data-page="checklist">
+          <span>✓</span> Pre-Trade
+        </button>
+
+        <button class="nav-item" data-page="plan">
+          <span>◈</span> Trade Plan
+        </button>
+
+        <button class="nav-item" data-page="analytics">
+          <span>◒</span> Analytics
+        </button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="discipline-mini">
+          <div class="mini-title">
+            <span>Discipline</span>
+            <strong id="sidebarDiscipline">0%</strong>
+          </div>
+          <div class="progress">
+            <div id="sidebarProgress"></div>
+          </div>
+          <small>Based on your journal</small>
+        </div>
+
+        <button class="settings-btn" id="backupBtn">
+          ⇩ Backup Data
+        </button>
+
+        <button class="settings-btn" id="importBtn">
+          ⇧ Import Data
+        </button>
+
+        <input type="file" id="importFile" accept=".json" hidden />
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <!-- TOP BAR -->
+      <header class="topbar">
+        <button class="mobile-menu" id="mobileMenu">☰</button>
+
+        <div>
+          <h1 id="pageTitle">Dashboard</h1>
+          <p id="pageSubtitle">Your trading performance at a glance.</p>
+        </div>
+
+        <div class="top-actions">
+          <div class="market-status">
+            <span class="status-dot"></span>
+            Journal Active
+          </div>
+
+          <button class="primary-btn" id="newTradeBtn">
+            + Log Trade
+          </button>
+        </div>
+      </header>
+
+      <!-- DASHBOARD -->
+      <section class="page active" id="dashboard">
+
+        <div class="welcome-card">
+          <div>
+            <span class="eyebrow">TRADING SESSION</span>
+            <h2>Trade your plan, not your emotions.</h2>
+            <p>
+              Prepare your setup, control your risk, execute, then review.
+            </p>
+          </div>
+
+          <button class="outline-btn" data-page-target="checklist">
+            Start Pre-Trade →
+          </button>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span>Net P&L</span>
+            <strong id="statPnl">$0.00</strong>
+            <small id="statPnlSub">0 trades</small>
+          </div>
+
+          <div class="stat-card">
+            <span>Win Rate</span>
+            <strong id="statWinRate">0%</strong>
+            <small id="statWinSub">0 wins / 0 trades</small>
+          </div>
+
+          <div class="stat-card">
+            <span>Average R</span>
+            <strong id="statAvgR">0.00R</strong>
+            <small>Per trade</small>
+          </div>
+
+          <div class="stat-card">
+            <span>Discipline</span>
+            <strong id="statDiscipline">0%</strong>
+            <small>Plan compliance</small>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <span class="eyebrow">PERFORMANCE</span>
+                <h3>Equity Curve</h3>
+              </div>
+
+              <span class="period-badge">All Time</span>
+            </div>
+
+            <div class="chart-container">
+              <svg id="equityChart" viewBox="0 0 800 280"
+                   preserveAspectRatio="none"></svg>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <span class="eyebrow">TODAY</span>
+                <h3>Session Checklist</h3>
+              </div>
+              <button class="text-btn" data-page-target="checklist">
+                Open
+              </button>
+            </div>
+
+            <div id="dashboardChecklist" class="compact-checklist"></div>
+          </div>
+
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <span class="eyebrow">RECENT ACTIVITY</span>
+              <h3>Recent Trades</h3>
+            </div>
+
+            <button class="text-btn" data-page-target="journal">
+              View Journal →
+            </button>
+          </div>
+
+          <div id="recentTrades" class="trade-table"></div>
+        </div>
+      </section>
+
+      <!-- JOURNAL -->
+      <section class="page" id="journal">
+
+        <div class="page-toolbar">
+          <div class="search-box">
+            <span>⌕</span>
+            <input id="journalSearch"
+                   placeholder="Search symbol, setup, notes..." />
+          </div>
+
+          <select id="journalFilter">
+            <option value="all">All Trades</option>
+            <option value="wins">Wins</option>
+            <option value="losses">Losses</option>
+            <option value="rule">Plan Followed</option>
+            <option value="broken">Rule Broken</option>
+          </select>
+
+          <button class="primary-btn" id="journalNewTrade">
+            + New Trade
+          </button>
+        </div>
+
+        <div class="journal-layout">
+
+          <div class="journal-list" id="journalList"></div>
+
+          <div class="journal-empty" id="journalEmpty">
+            <div class="empty-icon">▤</div>
+            <h3>No trade selected</h3>
+            <p>
+              Select a trade from your journal to review the full execution.
+            </p>
+          </div>
+
+          <div class="journal-detail hidden" id="journalDetail"></div>
+
+        </div>
+      </section>
+
+      <!-- CHECKLIST -->
+      <section class="page" id="checklist">
+
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">BEFORE YOU ENTER</span>
+            <h2>Pre-Trade Checklist</h2>
+            <p>
+              If the setup is not clear, the trade is not ready.
+            </p>
+          </div>
+
+          <div class="check-score">
+            <strong id="checkScore">0%</strong>
+            <span>Ready</span>
+          </div>
+        </div>
+
+        <div class="checklist-grid">
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>1. Market Context</h3>
+            </div>
+
+            <div class="check-item">
+              <input type="checkbox" data-check="trend" />
+              <div>
+                <strong>Higher timeframe bias is clear</strong>
+                <small>Trend, range, or transition identified.</small>
+              </div>
+            </div>
+
+            <div class="check-item">
+              <input type="checkbox" data-check="levels" />
+              <div>
+                <strong>Important levels marked</strong>
+                <small>Support, resistance, liquidity, structure.</small>
+              </div>
+            </div>
+
+            <div class="check-item">
+              <input type="checkbox" data-check="news" />
+              <div>
+                <strong>No dangerous news window</strong>
+                <small>CPI, NFP, FOMC or other major events checked.</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>2. Setup Quality</h3>
+            </div>
+
+            <div class="check-item">
+              <input type="checkbox" data-check="setup" />
+              <div>
+                <strong>My exact setup is present</strong>
+                <small>No improvising or chasing price.</small>
+              </div>
+            </div>
+
+            <div class="check-item">
+              <input type="checkbox" data-check="entry" />
+              <div>
+                <strong>Entry trigger is confirmed</strong>
+                <small>My predefined entry condition has occurred.</small>
+              </div>
+            </div>
+
+            <div class="check-item">
+              <input type="checkbox" data-check="rr" />
+              <div>
+                <strong>Risk/reward is acceptable</strong>
+                <small>Trade has enough room to justify the risk.</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>3. Risk Management</h3>
+            </div>
+
+            <div class="check-item">
+              <input type="checkbox" data-check="risk" />
+              <div>
+                <strong>Risk amount is known</strong>
+                <small>Position size is based on predefined risk.</small>
+              </div>
+            </div>
+
+            <div class="check-item">
+              <input type="checkbox" data-check="stop" />
+              <div>
+                <strong>Stop loss is defined</strong>
+                <small>Invalidation level is clear before entry.</small>
+              </div>
+            </div>
+
+            <div class="check-item">
+              <input type="checkbox" data-check="target" />
+              <div>
+                <strong>Target is defined</strong>
+                <small>Know where the idea is expected to work.</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>4. Psychology</h3>
+            </div>
+
+            <div class="check-item">
+              <input type="checkbox" data-check="calm" />
+              <div>
+                <strong>I am calm</strong>
+                <small>Not angry, desperate, euphoric or afraid.</small>
+              </div>
+            </div>
+
+            <div class="check-item">
+              <input type="checkbox" data-check="revenge" />
+              <div>
+                <strong>This is not revenge trading</strong>
+                <small>I am not trying to recover a previous loss.</small>
+              </div>
+            </div>
+
+            <div class="check-item">
+              <input type="checkbox" data-check="fomo" />
+              <div>
+                <strong>I am not chasing</strong>
+                <small>Missing the trade is acceptable.</small>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="ready-card" id="readyCard">
+          <div>
+            <span class="ready-icon">✓</span>
+            <div>
+              <strong>Complete your checklist</strong>
+              <p>
+                Every unchecked item is a reason to pause before entering.
+              </p>
+            </div>
+          </div>
+
+          <button class="primary-btn" id="resetChecklist">
+            Reset Checklist
+          </button>
+        </div>
+      </section>
+
+      <!-- PLAN -->
+      <section class="page" id="plan">
+
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">YOUR PLAYBOOK</span>
+            <h2>Trading Plan</h2>
+            <p>
+              Define the rules you agree to follow before the market opens.
+            </p>
+          </div>
+
+          <button class="primary-btn" id="savePlan">
+            Save Plan
+          </button>
+        </div>
+
+        <div class="plan-grid">
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>Strategy</h3>
+            </div>
+
+            <label>Plan Name</label>
+            <input id="planName" class="form-input"
+                   placeholder="Example: London Breakout" />
+
+            <label>Markets</label>
+            <input id="planMarkets" class="form-input"
+                   placeholder="EURUSD, GBPUSD, XAUUSD" />
+
+            <label>Trading Sessions</label>
+            <input id="planSession" class="form-input"
+                   placeholder="London / New York" />
+
+            <label>Market Conditions</label>
+            <textarea id="planContext" class="form-input"
+              placeholder="Describe when this strategy is valid..."></textarea>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>Entry Rules</h3>
+            </div>
+
+            <textarea id="planEntry" class="large-textarea"
+              placeholder="1. Higher timeframe bias...
+2. Price reaches key level...
+3. Confirmation candle...
+4. Entry trigger..."></textarea>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>Risk Rules</h3>
+            </div>
+
+            <div class="two-col">
+              <div>
+                <label>Risk Per Trade %</label>
+                <input id="planRisk" type="number"
+                       class="form-input" value="1" step="0.1" />
+              </div>
+
+              <div>
+                <label>Minimum R:R</label>
+                <input id="planRR" type="number"
+                       class="form-input" value="2" step="0.1" />
+              </div>
+            </div>
+
+            <label>Daily Loss Limit</label>
+            <input id="planDailyLoss" class="form-input"
+                   placeholder="$500" />
+
+            <label>Maximum Trades / Day</label>
+            <input id="planMaxTrades" type="number"
+                   class="form-input" value="3" />
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>Management Rules</h3>
+            </div>
+
+            <textarea id="planManagement" class="large-textarea"
+              placeholder="Where do you take partials?
+When can you move stop?
+When is the setup invalid?
+What do you do after a loss?"></textarea>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ANALYTICS -->
+      <section class="page" id="analytics">
+
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">REVIEW</span>
+            <h2>Performance Analytics</h2>
+            <p>Find patterns in your execution.</p>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span>Total Trades</span>
+            <strong id="analyticsTrades">0</strong>
+          </div>
+
+          <div class="stat-card">
+            <span>Profit Factor</span>
+            <strong id="analyticsPF">0.00</strong>
+          </div>
+
+          <div class="stat-card">
+            <span>Best Trade</span>
+            <strong id="analyticsBest">$0</strong>
+          </div>
+
+          <div class="stat-card">
+            <span>Worst Trade</span>
+            <strong id="analyticsWorst">$0</strong>
+          </div>
+        </div>
+
+        <div class="analytics-grid">
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>Results by Setup</h3>
+            </div>
+            <div id="setupAnalytics"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>Emotions</h3>
+            </div>
+            <div id="emotionAnalytics"></div>
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <!-- TRADE MODAL -->
+  <div class="modal-overlay" id="tradeModal">
+
+    <div class="modal">
+
+      <div class="modal-header">
+        <div>
+          <span class="eyebrow">JOURNAL ENTRY</span>
+          <h2>Log Trade</h2>
+        </div>
+
+        <button class="close-btn" id="closeModal">×</button>
+      </div>
+
+      <form id="tradeForm">
+
+        <div class="form-section">
+          <h3>Trade Details</h3>
+
+          <div class="form-grid">
+
+            <div>
+              <label>Date</label>
+              <input id="tradeDate" type="date" required />
+            </div>
+
+            <div>
+              <label>Symbol</label>
+              <input id="tradeSymbol"
+                     placeholder="EURUSD"
+                     required />
+            </div>
+
+            <div>
+              <label>Direction</label>
+              <select id="tradeDirection">
+                <option value="Long">Long</option>
+                <option value="Short">Short</option>
+              </select>
+            </div>
+
+            <div>
+              <label>Setup</label>
+              <input id="tradeSetup"
+                     placeholder="Breakout" />
+            </div>
+
+            <div>
+              <label>Entry</label>
+              <input id="tradeEntry"
+                     type="number"
+                     step="any"
+                     placeholder="1.0850" />
+            </div>
+
+            <div>
+              <label>Stop Loss</label>
+              <input id="tradeStop"
+                     type="number"
+                     step="any"
+                     placeholder="1.0820" />
+            </div>
+
+            <div>
+              <label>Target</label>
+              <input id="tradeTarget"
+                     type="number"
+                     step="any"
+                     placeholder="1.0910" />
+            </div>
+
+            <div>
+              <label>Exit</label>
+              <input id="tradeExit"
+                     type="number"
+                     step="any"
+                     placeholder="1.0890" />
+            </div>
+
+            <div>
+              <label>P&L ($)</label>
+              <input id="tradePnl"
+                     type="number"
+                     step="any"
+                     placeholder="150" />
+            </div>
+
+            <div>
+              <label>R Multiple</label>
+              <input id="tradeR"
+                     type="number"
+                     step="any"
+                     placeholder="2.0" />
+            </div>
+
+          </div>
+        </div>
+
+        <div class="form-section">
+
+          <h3>Execution Review</h3>
+
+          <div class="emotion-row">
+            <label>Entry Emotion</label>
+
+            <div class="emotion-options">
+              <button type="button" class="emotion" data-emotion="Calm">😌 Calm</button>
+              <button type="button" class="emotion" data-emotion="Confident">😎 Confident</button>
+              <button type="button" class="emotion" data-emotion="FOMO">😰 FOMO</button>
+              <button type="button" class="emotion" data-emotion="Fear">😨 Fear</button>
+              <button type="button" class="emotion" data-emotion="Revenge">😡 Revenge</button>
+            </div>
+          </div>
+
+          <label class="switch-row">
+            <input type="checkbox" id="tradePlanFollowed" />
+            <span class="switch"></span>
+            I followed my trading plan
+          </label>
+
+          <label>What was your reasoning?</label>
+          <textarea id="tradeReason"
+            class="large-textarea"
+            placeholder="Why did you take this trade?"></textarea>
+
+          <label>What did you learn?</label>
+          <textarea id="tradeLesson"
+            class="large-textarea"
+            placeholder="What would you repeat or change?"></textarea>
+
+          <label>Chart Screenshot</label>
+
+          <div class="upload-box" id="uploadBox">
+            <input type="file"
+                   id="tradeScreenshot"
+                   accept="image/*"
+                   hidden />
+
+            <div>🖼️</div>
+            <strong>Upload chart screenshot</strong>
+            <small>PNG, JPG or WEBP</small>
+          </div>
+
+          <img id="screenshotPreview"
+               class="screenshot-preview hidden" />
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button"
+                  class="outline-btn"
+                  id="cancelTrade">
+            Cancel
+          </button>
+
+          <button class="primary-btn" type="submit">
+            Save Trade
+          </button>
+        </div>
+
+      </form>
     </div>
   </div>
 
-  <!-- Professional Navigation Header -->
-  <header class="navbar">
-    <div class="brand-logo"><span class="glow">EDGE</span>FLO <span class="sub-badge">TERMINAL</span></div>
-    <nav class="nav-links">
-      <a href="#chart-section" class="active">Live Chart</a>
-      <a href="#premarket-section">Pre-Market Plan</a>
-      <a href="#checklist-section">Discipline Rules</a>
-      <a href="#journal-section">Post-Trade Journal</a>
-    </nav>
-    <div class="system-status-pill">
-      <span class="status-dot" id="status-dot"></span>
-      <span id="status-text">System Locked</span>
-    </div>
-  </header>
-
-  <!-- Main Application Container -->
-  <main class="app-container">
-
-    <!-- Section 1: Live Chart Dashboard -->
-    <section id="chart-section" class="terminal-card">
-      <div class="card-header-flex">
-        <div>
-          <h2>EUR/USD Execution Chart</h2>
-          <p class="card-subtitle">Real-time institutional liquidity feeds & technical tools</p>
-        </div>
-        <div class="session-badge">London / NY Killzone</div>
-      </div>
-      <div class="tradingview-embed-box">
-        <div id="tradingview_chart" style="height:100%;width:100%"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-        <script type="text/javascript">
-          new TradingView.widget({
-            "autosize": true,
-            "symbol": "FX:EURUSD",
-            "interval": "15",
-            "timezone": "Etc/UTC",
-            "theme": "dark",
-            "style": "1",
-            "locale": "en",
-            "toolbar_bg": "#0e121b",
-            "enable_publishing": false,
-            "allow_symbol_change": true,
-            "container_id": "tradingview_chart"
-          });
-        </script>
-      </div>
-    </section>
-
-    <!-- Section 2: Pre-Market Routine & Bias Plan -->
-    <section id="premarket-section" class="terminal-card">
-      <div class="card-header-flex">
-        <div>
-          <h2>1. Pre-Market Routine & Bias</h2>
-          <p class="card-subtitle">Lock in your macro bias and key levels before taking risk</p>
-        </div>
-      </div>
-      <div class="grid-2col">
-        <div class="input-group">
-          <label>DXY & Higher Timeframe Bias</label>
-          <textarea id="plan-bias" rows="3" placeholder="e.g. DXY is sweeping 104.20 liquidity. Looking for bullish continuation on EUR..."></textarea>
-        </div>
-        <div class="input-group">
-          <label>Key Session Levels & Targets</label>
-          <textarea id="plan-levels" rows="3" placeholder="e.g. Asian High: 1.0855 | Asian Low: 1.0810 | Invalidation: 1.0790..."></textarea>
-        </div>
-      </div>
-      <div class="card-footer-action">
-        <button id="save-plan-btn" class="btn-primary">Save Pre-Market Plan</button>
-      </div>
-    </section>
-
-    <!-- Section 3: Discipline Guardrails Checklist -->
-    <section id="checklist-section" class="terminal-card">
-      <div class="card-header-flex">
-        <div>
-          <h2>2. Discipline Execution Rules</h2>
-          <p class="card-subtitle">Complete mandatory criteria to unlock terminal execution</p>
-        </div>
-        <div class="progress-indicator-box">
-          <span class="progress-text" id="progress-text">0/0 Completed</span>
-          <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
-        </div>
-      </div>
-
-      <form id="add-rule-form" class="inline-form">
-        <input type="text" id="new-rule-input" placeholder="Add custom guardrail rule (e.g. Check ForexFactory Calendar)..." required />
-        <button type="submit" class="btn-secondary">+ Add Rule</button>
-      </form>
-
-      <div class="checklist-stack" id="checklist-container"></div>
-    </section>
-
-    <!-- Section 4: Post-Trade Journal with Before & After Screenshots -->
-    <section id="journal-section" class="terminal-card">
-      <div class="card-header-flex">
-        <div>
-          <h2>3. Post-Trade Review & Screenshots</h2>
-          <p class="card-subtitle">Upload visual proof of your setup before and after execution</p>
-        </div>
-      </div>
-
-      <form id="journal-form" class="journal-form-grid">
-        <div class="grid-4col">
-          <div class="input-group">
-            <label>Asset Pair</label>
-            <input type="text" id="trade-pair" value="EUR/USD" required />
-          </div>
-          <div class="input-group">
-            <label>Direction</label>
-            <select id="trade-dir">
-              <option value="LONG">LONG (Buy)</option>
-              <option value="SHORT">SHORT (Sell)</option>
-            </select>
-          </div>
-          <div class="input-group">
-            <label>Result / Outcome</label>
-            <input type="text" id="trade-result" placeholder="+2.5R or +30 Pips" required />
-          </div>
-          <div class="input-group">
-            <label>Execution Grade</label>
-            <select id="trade-grade">
-              <option value="A+">A+ Setup (Flawless)</option>
-              <option value="A">A Setup (Clean)</option>
-              <option value="B">B Setup (Minor Flaw)</option>
-              <option value="C">C Setup (Rule Broken)</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Before & After Image Drop/Link Zones -->
-        <div class="screenshot-dropzone-grid">
-          <div class="pane-upload">
-            <span class="pane-title">📷 BEFORE ENTRY (Setup Analysis)</span>
-            <input type="file" id="file-before" accept="image/*" class="file-input-hidden" />
-            <input type="url" id="url-before" placeholder="Paste TradingView image URL..." />
-            <div id="preview-before-box" class="image-preview-frame hidden">
-              <img id="img-preview-before" src="" alt="Before Entry" />
-            </div>
-          </div>
-
-          <div class="pane-upload">
-            <span class="pane-title">📸 AFTER EXIT (Result & Management)</span>
-            <input type="file" id="file-after" accept="image/*" class="file-input-hidden" />
-            <input type="url" id="url-after" placeholder="Paste TradingView image URL..." />
-            <div id="preview-after-box" class="image-preview-frame hidden">
-              <img id="img-preview-after" src="" alt="After Exit" />
-            </div>
-          </div>
-        </div>
-
-        <div class="input-group">
-          <label>Psychology & Review Notes</label>
-          <textarea id="trade-notes" rows="3" placeholder="What did you learn? Did you stick to your target management rules?" required></textarea>
-        </div>
-
-        <button type="submit" class="btn-primary">Log Trade to Journal</button>
-      </form>
-    </section>
-
-    <!-- Section 5: Trade History Logs -->
-    <section class="terminal-card">
-      <div class="card-header-flex">
-        <div>
-          <h2>Trade History & Visual Review</h2>
-          <p class="card-subtitle">Your saved session entries and screen captures</p>
-        </div>
-        <button id="clear-logs-btn" class="btn-secondary">Clear History</button>
-      </div>
-
-      <div id="history-container" class="history-stack"></div>
-    </section>
-
-  </main>
+  <div class="toast" id="toast"></div>
 
   <script src="app.js"></script>
 </body>
