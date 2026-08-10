@@ -1,706 +1,4034 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#080b12" />
-  <title>TradeFlow — Trading Journal</title>
-  <link rel="stylesheet" href="styles.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TradeFlow - Trading Journal</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #080b10;
+  --panel: #0d1219;
+  --panel2: #111720;
+  --border: #202936;
+  --text: #f1f5f9;
+  --muted: #7d8898;
+  --green: #25d69b;
+  --red: #ff5d6c;
+  --yellow: #e7b84b;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, Arial, sans-serif;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* SIDEBAR */
+
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 245px;
+  background: #0a0e14;
+  border-right: 1px solid var(--border);
+  padding: 24px 16px;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 35px;
+}
+
+.brand-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--green);
+  color: #06120e;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 20px;
+}
+
+.brand strong {
+  display: block;
+  font-size: 16px;
+}
+
+.brand span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 3px;
+}
+
+.nav {
+  display: grid;
+  gap: 7px;
+}
+
+.nav-item,
+.settings-btn {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  text-align: left;
+  padding: 12px 13px;
+  border-radius: 9px;
+}
+
+.nav-item:hover,
+.settings-btn:hover {
+  background: #121923;
+  color: white;
+}
+
+.nav-item.active {
+  background: #13231f;
+  color: var(--green);
+}
+
+.nav-item span {
+  display: inline-block;
+  width: 25px;
+}
+
+.sidebar-bottom {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 20px;
+}
+
+.discipline-mini {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.mini-title {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.mini-title strong {
+  color: var(--green);
+}
+
+.progress {
+  height: 5px;
+  background: #202732;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 9px 0;
+}
+
+.progress div {
+  width: 0;
+  height: 100%;
+  background: var(--green);
+}
+
+.discipline-mini small {
+  color: var(--muted);
+}
+
+/* MAIN */
+
+.main {
+  margin-left: 245px;
+  min-height: 100vh;
+  padding: 25px 35px 50px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.topbar p {
+  color: var(--muted);
+  margin: 6px 0 0;
+  font-size: 13px;
+}
+
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.market-status {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  background: var(--green);
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.primary-btn,
+.outline-btn {
+  border-radius: 8px;
+  padding: 11px 16px;
+  font-weight: 700;
+  border: 1px solid var(--green);
+}
+
+.primary-btn {
+  background: var(--green);
+  color: #06120e;
+}
+
+.outline-btn {
+  background: transparent;
+  color: var(--green);
+}
+
+.primary-btn:hover {
+  filter: brightness(1.08);
+}
+
+.outline-btn:hover {
+  background: #10241f;
+}
+
+.text-btn {
+  border: 0;
+  background: transparent;
+  color: var(--green);
+  cursor: pointer;
+}
+
+.mobile-menu {
+  display: none;
+}
+
+/* PAGES */
+
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+}
+
+.welcome-card {
+  background: linear-gradient(120deg, #10251f, #101821);
+  border: 1px solid #1e4037;
+  border-radius: 14px;
+  padding: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.welcome-card h2 {
+  margin: 8px 0;
+}
+
+.welcome-card p {
+  color: var(--muted);
+  margin: 0;
+}
+
+.eyebrow {
+  color: var(--green);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  font-weight: 800;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.stat-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.stat-card span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.stat-card strong {
+  display: block;
+  font-size: 25px;
+  margin: 10px 0 5px;
+}
+
+.stat-card small {
+  color: var(--muted);
+}
+
+.pnl-positive {
+  color: var(--green) !important;
+}
+
+.pnl-negative {
+  color: var(--red) !important;
+}
+
+.dashboard-grid,
+.analytics-grid,
+.plan-grid,
+.checklist-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin-bottom: 18px;
+}
+
+.checklist-grid {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.panel-header h3 {
+  margin: 5px 0 0;
+}
+
+.period-badge {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.chart-container {
+  height: 260px;
+}
+
+#equityChart {
+  width: 100%;
+  height: 100%;
+}
+
+.chart-grid {
+  stroke: #202936;
+  stroke-width: 1;
+}
+
+.chart-area {
+  fill: url(#areaGradient);
+}
+
+.chart-line {
+  fill: none;
+  stroke: var(--green);
+  stroke-width: 3;
+}
+
+.compact-checklist {
+  display: grid;
+  gap: 8px;
+}
+
+.compact-item {
+  color: var(--muted);
+  padding: 10px;
+  background: #0a0f15;
+  border-radius: 7px;
+}
+
+.compact-item.done {
+  color: var(--green);
+}
+
+/* JOURNAL */
+
+.page-toolbar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.search-box {
+  flex: 1;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+}
+
+.search-box input {
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: white;
+  padding: 12px;
+}
+
+select,
+.form-input,
+textarea {
+  background: #0a0f15;
+  border: 1px solid var(--border);
+  color: white;
+  border-radius: 7px;
+  padding: 11px;
+  outline: none;
+}
+
+.page-toolbar select {
+  min-width: 150px;
+}
+
+.journal-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 15px;
+}
+
+.journal-list {
+  display: grid;
+  gap: 8px;
+}
+
+.journal-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 14px;
+  cursor: pointer;
+}
+
+.journal-card:hover,
+.journal-card.selected {
+  border-color: var(--green);
+}
+
+.journal-card-top,
+.journal-card-bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.journal-card-bottom {
+  margin-top: 12px;
+  align-items: center;
+}
+
+.symbol {
+  font-weight: 800;
+}
+
+.journal-date {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.setup-tag {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.journal-empty,
+.journal-detail {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 25px;
+}
+
+.empty-state {
+  color: var(--muted);
+  text-align: center;
+  padding: 35px 15px;
+}
+
+.empty-icon {
+  font-size: 35px;
+  margin-bottom: 10px;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.detail-pnl {
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 25px 0;
+}
+
+.detail-stat {
+  background: #0a0f15;
+  padding: 12px;
+  border-radius: 7px;
+}
+
+.detail-stat span {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  margin-bottom: 7px;
+}
+
+.detail-stat strong {
+  font-size: 13px;
+}
+
+.detail-section {
+  border-top: 1px solid var(--border);
+  padding-top: 15px;
+  margin-top: 15px;
+}
+
+.detail-section p {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.detail-screenshot {
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+/* CHECKLIST */
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-heading h2 {
+  margin: 7px 0;
+}
+
+.section-heading p {
+  color: var(--muted);
+  margin: 0;
+}
+
+.check-score {
+  text-align: center;
+}
+
+.check-score strong {
+  display: block;
+  color: var(--green);
+  font-size: 30px;
+}
+
+.check-score span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.check-item {
+  display: flex;
+  gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid #19202a;
+}
+
+.check-item:last-child {
+  border-bottom: 0;
+}
+
+.check-item input {
+  accent-color: var(--green);
+  width: 17px;
+  height: 17px;
+}
+
+.check-item strong {
+  display: block;
+  font-size: 13px;
+}
+
+.check-item small {
+  color: var(--muted);
+  display: block;
+  margin-top: 4px;
+}
+
+.ready-card {
+  background: #17140b;
+  border: 1px solid #392f18;
+  border-radius: 12px;
+  padding: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ready-card > div {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.ready-icon {
+  color: var(--green);
+  font-size: 25px;
+}
+
+.ready-card p {
+  color: var(--muted);
+  margin: 5px 0 0;
+}
+
+/* PLAN */
+
+.plan-grid {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.panel label {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  margin: 15px 0 6px;
+}
+
+.form-input,
+.large-textarea {
+  width: 100%;
+}
+
+.large-textarea {
+  min-height: 145px;
+  resize: vertical;
+}
+
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* ANALYTICS */
+
+.analytics-row {
+  padding: 12px 0;
+  border-bottom: 1px solid #19202a;
+}
+
+.analytics-row-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.analytics-bar {
+  height: 7px;
+  background: #202732;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.analytics-bar div {
+  height: 100%;
+}
+
+/* MODAL */
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.75);
+  z-index: 500;
+  padding: 25px;
+  overflow-y: auto;
+}
+
+.modal-overlay.active {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.modal {
+  width: min(850px, 100%);
+  background: #0d1219;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 25px;
+  margin: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 25px;
+}
+
+.modal-header h2 {
+  margin: 7px 0 0;
+}
+
+.close-btn {
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  font-size: 28px;
+}
+
+.form-section {
+  border-top: 1px solid var(--border);
+  padding: 20px 0;
+}
+
+.form-section h3 {
+  margin-top: 0;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.form-grid input,
+.form-grid select {
+  width: 100%;
+}
+
+.emotion-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.emotion {
+  background: #101720;
+  border: 1px solid var(--border);
+  color: white;
+  border-radius: 7px;
+  padding: 9px 12px;
+}
+
+.emotion.selected {
+  border-color: var(--green);
+  color: var(--green);
+  background: #10241f;
+}
+
+.switch-row {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  color: white !important;
+}
+
+.switch-row input {
+  accent-color: var(--green);
+}
+
+.upload-box {
+  border: 1px dashed #344050;
+  border-radius: 8px;
+  padding: 25px;
+  text-align: center;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.upload-box strong,
+.upload-box small {
+  display: block;
+  margin-top: 5px;
+}
+
+.screenshot-preview {
+  max-width: 100%;
+  max-height: 250px;
+  margin-top: 12px;
+  border-radius: 8px;
+}
+
+.modal-footer {
+  border-top: 1px solid var(--border);
+  padding-top: 18px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* TOAST */
+
+.toast {
+  position: fixed;
+  right: 25px;
+  bottom: 25px;
+  background: #17211d;
+  border: 1px solid #245443;
+  color: var(--green);
+  padding: 13px 17px;
+  border-radius: 8px;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: .25s;
+  z-index: 1000;
+}
+
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: .25s;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .main {
+    margin-left: 0;
+    padding: 20px;
+  }
+
+  .mobile-menu {
+    display: block;
+    background: transparent;
+    border: 0;
+    color: white;
+    font-size: 22px;
+    margin-right: 12px;
+  }
+
+  .topbar {
+    align-items: flex-start;
+  }
+
+  .topbar > div:first-of-type {
+    flex: 1;
+  }
+
+  .top-actions .market-status {
+    display: none;
+  }
+
+  .stats-grid,
+  .dashboard-grid,
+  .analytics-grid,
+  .plan-grid,
+  .checklist-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .journal-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .main {
+    padding: 15px;
+  }
+
+  .topbar h1 {
+    font-size: 22px;
+  }
+
+  .welcome-card,
+  .section-heading,
+  .ready-card {
+    display: block;
+  }
+
+  .welcome-card .outline-btn,
+  .section-heading .primary-btn,
+  .ready-card .primary-btn {
+    margin-top: 15px;
+  }
+
+  .page-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .search-box {
+    min-width: 100%;
+  }
+
+  .form-grid,
+  .detail-grid,
+  .two-col {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-overlay {
+    padding: 10px;
+  }
+
+  .modal {
+    padding: 18px;
+  }
+}
+</style>
 </head>
 
 <body>
-  <div class="app-shell">
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar" id="sidebar">
-      <div class="brand">
-        <div class="brand-mark">T</div>
-        <div>
-          <strong>TradeFlow</strong>
-          <span>Trading Journal</span>
-        </div>
-      </div>
-
-      <nav class="nav">
-        <button class="nav-item active" data-page="dashboard">
-          <span>⌂</span> Dashboard
-        </button>
-
-        <button class="nav-item" data-page="journal">
-          <span>▤</span> Journal
-        </button>
-
-        <button class="nav-item" data-page="checklist">
-          <span>✓</span> Pre-Trade
-        </button>
-
-        <button class="nav-item" data-page="plan">
-          <span>◈</span> Trade Plan
-        </button>
-
-        <button class="nav-item" data-page="analytics">
-          <span>◒</span> Analytics
-        </button>
-      </nav>
-
-      <div class="sidebar-bottom">
-        <div class="discipline-mini">
-          <div class="mini-title">
-            <span>Discipline</span>
-            <strong id="sidebarDiscipline">0%</strong>
-          </div>
-          <div class="progress">
-            <div id="sidebarProgress"></div>
-          </div>
-          <small>Based on your journal</small>
-        </div>
-
-        <button class="settings-btn" id="backupBtn">
-          ⇩ Backup Data
-        </button>
-
-        <button class="settings-btn" id="importBtn">
-          ⇧ Import Data
-        </button>
-
-        <input type="file" id="importFile" accept=".json" hidden />
-      </div>
-    </aside>
-
-    <!-- MAIN -->
-    <main class="main">
-
-      <!-- TOP BAR -->
-      <header class="topbar">
-        <button class="mobile-menu" id="mobileMenu">☰</button>
-
-        <div>
-          <h1 id="pageTitle">Dashboard</h1>
-          <p id="pageSubtitle">Your trading performance at a glance.</p>
-        </div>
-
-        <div class="top-actions">
-          <div class="market-status">
-            <span class="status-dot"></span>
-            Journal Active
-          </div>
-
-          <button class="primary-btn" id="newTradeBtn">
-            + Log Trade
-          </button>
-        </div>
-      </header>
-
-      <!-- DASHBOARD -->
-      <section class="page active" id="dashboard">
-
-        <div class="welcome-card">
-          <div>
-            <span class="eyebrow">TRADING SESSION</span>
-            <h2>Trade your plan, not your emotions.</h2>
-            <p>
-              Prepare your setup, control your risk, execute, then review.
-            </p>
-          </div>
-
-          <button class="outline-btn" data-page-target="checklist">
-            Start Pre-Trade →
-          </button>
-        </div>
-
-        <div class="stats-grid">
-          <div class="stat-card">
-            <span>Net P&L</span>
-            <strong id="statPnl">$0.00</strong>
-            <small id="statPnlSub">0 trades</small>
-          </div>
-
-          <div class="stat-card">
-            <span>Win Rate</span>
-            <strong id="statWinRate">0%</strong>
-            <small id="statWinSub">0 wins / 0 trades</small>
-          </div>
-
-          <div class="stat-card">
-            <span>Average R</span>
-            <strong id="statAvgR">0.00R</strong>
-            <small>Per trade</small>
-          </div>
-
-          <div class="stat-card">
-            <span>Discipline</span>
-            <strong id="statDiscipline">0%</strong>
-            <small>Plan compliance</small>
-          </div>
-        </div>
-
-        <div class="dashboard-grid">
-
-          <div class="panel">
-            <div class="panel-header">
-              <div>
-                <span class="eyebrow">PERFORMANCE</span>
-                <h3>Equity Curve</h3>
-              </div>
-
-              <span class="period-badge">All Time</span>
-            </div>
-
-            <div class="chart-container">
-              <svg id="equityChart" viewBox="0 0 800 280"
-                   preserveAspectRatio="none"></svg>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-header">
-              <div>
-                <span class="eyebrow">TODAY</span>
-                <h3>Session Checklist</h3>
-              </div>
-              <button class="text-btn" data-page-target="checklist">
-                Open
-              </button>
-            </div>
-
-            <div id="dashboardChecklist" class="compact-checklist"></div>
-          </div>
-
-        </div>
-
-        <div class="panel">
-          <div class="panel-header">
-            <div>
-              <span class="eyebrow">RECENT ACTIVITY</span>
-              <h3>Recent Trades</h3>
-            </div>
-
-            <button class="text-btn" data-page-target="journal">
-              View Journal →
-            </button>
-          </div>
-
-          <div id="recentTrades" class="trade-table"></div>
-        </div>
-      </section>
-
-      <!-- JOURNAL -->
-      <section class="page" id="journal">
-
-        <div class="page-toolbar">
-          <div class="search-box">
-            <span>⌕</span>
-            <input id="journalSearch"
-                   placeholder="Search symbol, setup, notes..." />
-          </div>
-
-          <select id="journalFilter">
-            <option value="all">All Trades</option>
-            <option value="wins">Wins</option>
-            <option value="losses">Losses</option>
-            <option value="rule">Plan Followed</option>
-            <option value="broken">Rule Broken</option>
-          </select>
-
-          <button class="primary-btn" id="journalNewTrade">
-            + New Trade
-          </button>
-        </div>
-
-        <div class="journal-layout">
-
-          <div class="journal-list" id="journalList"></div>
-
-          <div class="journal-empty" id="journalEmpty">
-            <div class="empty-icon">▤</div>
-            <h3>No trade selected</h3>
-            <p>
-              Select a trade from your journal to review the full execution.
-            </p>
-          </div>
-
-          <div class="journal-detail hidden" id="journalDetail"></div>
-
-        </div>
-      </section>
-
-      <!-- CHECKLIST -->
-      <section class="page" id="checklist">
-
-        <div class="section-heading">
-          <div>
-            <span class="eyebrow">BEFORE YOU ENTER</span>
-            <h2>Pre-Trade Checklist</h2>
-            <p>
-              If the setup is not clear, the trade is not ready.
-            </p>
-          </div>
-
-          <div class="check-score">
-            <strong id="checkScore">0%</strong>
-            <span>Ready</span>
-          </div>
-        </div>
-
-        <div class="checklist-grid">
-
-          <div class="panel">
-            <div class="panel-header">
-              <h3>1. Market Context</h3>
-            </div>
-
-            <div class="check-item">
-              <input type="checkbox" data-check="trend" />
-              <div>
-                <strong>Higher timeframe bias is clear</strong>
-                <small>Trend, range, or transition identified.</small>
-              </div>
-            </div>
-
-            <div class="check-item">
-              <input type="checkbox" data-check="levels" />
-              <div>
-                <strong>Important levels marked</strong>
-                <small>Support, resistance, liquidity, structure.</small>
-              </div>
-            </div>
-
-            <div class="check-item">
-              <input type="checkbox" data-check="news" />
-              <div>
-                <strong>No dangerous news window</strong>
-                <small>CPI, NFP, FOMC or other major events checked.</small>
-              </div>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-header">
-              <h3>2. Setup Quality</h3>
-            </div>
-
-            <div class="check-item">
-              <input type="checkbox" data-check="setup" />
-              <div>
-                <strong>My exact setup is present</strong>
-                <small>No improvising or chasing price.</small>
-              </div>
-            </div>
-
-            <div class="check-item">
-              <input type="checkbox" data-check="entry" />
-              <div>
-                <strong>Entry trigger is confirmed</strong>
-                <small>My predefined entry condition has occurred.</small>
-              </div>
-            </div>
-
-            <div class="check-item">
-              <input type="checkbox" data-check="rr" />
-              <div>
-                <strong>Risk/reward is acceptable</strong>
-                <small>Trade has enough room to justify the risk.</small>
-              </div>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-header">
-              <h3>3. Risk Management</h3>
-            </div>
-
-            <div class="check-item">
-              <input type="checkbox" data-check="risk" />
-              <div>
-                <strong>Risk amount is known</strong>
-                <small>Position size is based on predefined risk.</small>
-              </div>
-            </div>
-
-            <div class="check-item">
-              <input type="checkbox" data-check="stop" />
-              <div>
-                <strong>Stop loss is defined</strong>
-                <small>Invalidation level is clear before entry.</small>
-              </div>
-            </div>
-
-            <div class="check-item">
-              <input type="checkbox" data-check="target" />
-              <div>
-                <strong>Target is defined</strong>
-                <small>Know where the idea is expected to work.</small>
-              </div>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-header">
-              <h3>4. Psychology</h3>
-            </div>
-
-            <div class="check-item">
-              <input type="checkbox" data-check="calm" />
-              <div>
-                <strong>I am calm</strong>
-                <small>Not angry, desperate, euphoric or afraid.</small>
-              </div>
-            </div>
-
-            <div class="check-item">
-              <input type="checkbox" data-check="revenge" />
-              <div>
-                <strong>This is not revenge trading</strong>
-                <small>I am not trying to recover a previous loss.</small>
-              </div>
-            </div>
-
-            <div class="check-item">
-              <input type="checkbox" data-check="fomo" />
-              <div>
-                <strong>I am not chasing</strong>
-                <small>Missing the trade is acceptable.</small>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <div class="ready-card" id="readyCard">
-          <div>
-            <span class="ready-icon">✓</span>
-            <div>
-              <strong>Complete your checklist</strong>
-              <p>
-                Every unchecked item is a reason to pause before entering.
-              </p>
-            </div>
-          </div>
-
-          <button class="primary-btn" id="resetChecklist">
-            Reset Checklist
-          </button>
-        </div>
-      </section>
-
-      <!-- PLAN -->
-      <section class="page" id="plan">
-
-        <div class="section-heading">
-          <div>
-            <span class="eyebrow">YOUR PLAYBOOK</span>
-            <h2>Trading Plan</h2>
-            <p>
-              Define the rules you agree to follow before the market opens.
-            </p>
-          </div>
-
-          <button class="primary-btn" id="savePlan">
-            Save Plan
-          </button>
-        </div>
-
-        <div class="plan-grid">
-
-          <div class="panel">
-            <div class="panel-header">
-              <h3>Strategy</h3>
-            </div>
-
-            <label>Plan Name</label>
-            <input id="planName" class="form-input"
-                   placeholder="Example: London Breakout" />
-
-            <label>Markets</label>
-            <input id="planMarkets" class="form-input"
-                   placeholder="EURUSD, GBPUSD, XAUUSD" />
-
-            <label>Trading Sessions</label>
-            <input id="planSession" class="form-input"
-                   placeholder="London / New York" />
-
-            <label>Market Conditions</label>
-            <textarea id="planContext" class="form-input"
-              placeholder="Describe when this strategy is valid..."></textarea>
-          </div>
-
-          <div class="panel">
-            <div class="panel-header">
-              <h3>Entry Rules</h3>
-            </div>
-
-            <textarea id="planEntry" class="large-textarea"
-              placeholder="1. Higher timeframe bias...
-2. Price reaches key level...
-3. Confirmation candle...
-4. Entry trigger..."></textarea>
-          </div>
-
-          <div class="panel">
-            <div class="panel-header">
-              <h3>Risk Rules</h3>
-            </div>
-
-            <div class="two-col">
-              <div>
-                <label>Risk Per Trade %</label>
-                <input id="planRisk" type="number"
-                       class="form-input" value="1" step="0.1" />
-              </div>
-
-              <div>
-                <label>Minimum R:R</label>
-                <input id="planRR" type="number"
-                       class="form-input" value="2" step="0.1" />
-              </div>
-            </div>
-
-            <label>Daily Loss Limit</label>
-            <input id="planDailyLoss" class="form-input"
-                   placeholder="$500" />
-
-            <label>Maximum Trades / Day</label>
-            <input id="planMaxTrades" type="number"
-                   class="form-input" value="3" />
-          </div>
-
-          <div class="panel">
-            <div class="panel-header">
-              <h3>Management Rules</h3>
-            </div>
-
-            <textarea id="planManagement" class="large-textarea"
-              placeholder="Where do you take partials?
-When can you move stop?
-When is the setup invalid?
-What do you do after a loss?"></textarea>
-          </div>
-
-        </div>
-      </section>
-
-      <!-- ANALYTICS -->
-      <section class="page" id="analytics">
-
-        <div class="section-heading">
-          <div>
-            <span class="eyebrow">REVIEW</span>
-            <h2>Performance Analytics</h2>
-            <p>Find patterns in your execution.</p>
-          </div>
-        </div>
-
-        <div class="stats-grid">
-          <div class="stat-card">
-            <span>Total Trades</span>
-            <strong id="analyticsTrades">0</strong>
-          </div>
-
-          <div class="stat-card">
-            <span>Profit Factor</span>
-            <strong id="analyticsPF">0.00</strong>
-          </div>
-
-          <div class="stat-card">
-            <span>Best Trade</span>
-            <strong id="analyticsBest">$0</strong>
-          </div>
-
-          <div class="stat-card">
-            <span>Worst Trade</span>
-            <strong id="analyticsWorst">$0</strong>
-          </div>
-        </div>
-
-        <div class="analytics-grid">
-
-          <div class="panel">
-            <div class="panel-header">
-              <h3>Results by Setup</h3>
-            </div>
-            <div id="setupAnalytics"></div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-header">
-              <h3>Emotions</h3>
-            </div>
-            <div id="emotionAnalytics"></div>
-          </div>
-
-        </div>
-
-      </section>
-
-    </main>
-  </div>
-
-  <!-- TRADE MODAL -->
-  <div class="modal-overlay" id="tradeModal">
-
-    <div class="modal">
-
-      <div class="modal-header">
-        <div>
-          <span class="eyebrow">JOURNAL ENTRY</span>
-          <h2>Log Trade</h2>
-        </div>
-
-        <button class="close-btn" id="closeModal">×</button>
-      </div>
-
-      <form id="tradeForm">
-
-        <div class="form-section">
-          <h3>Trade Details</h3>
-
-          <div class="form-grid">
-
-            <div>
-              <label>Date</label>
-              <input id="tradeDate" type="date" required />
-            </div>
-
-            <div>
-              <label>Symbol</label>
-              <input id="tradeSymbol"
-                     placeholder="EURUSD"
-                     required />
-            </div>
-
-            <div>
-              <label>Direction</label>
-              <select id="tradeDirection">
-                <option value="Long">Long</option>
-                <option value="Short">Short</option>
-              </select>
-            </div>
-
-            <div>
-              <label>Setup</label>
-              <input id="tradeSetup"
-                     placeholder="Breakout" />
-            </div>
-
-            <div>
-              <label>Entry</label>
-              <input id="tradeEntry"
-                     type="number"
-                     step="any"
-                     placeholder="1.0850" />
-            </div>
-
-            <div>
-              <label>Stop Loss</label>
-              <input id="tradeStop"
-                     type="number"
-                     step="any"
-                     placeholder="1.0820" />
-            </div>
-
-            <div>
-              <label>Target</label>
-              <input id="tradeTarget"
-                     type="number"
-                     step="any"
-                     placeholder="1.0910" />
-            </div>
-
-            <div>
-              <label>Exit</label>
-              <input id="tradeExit"
-                     type="number"
-                     step="any"
-                     placeholder="1.0890" />
-            </div>
-
-            <div>
-              <label>P&L ($)</label>
-              <input id="tradePnl"
-                     type="number"
-                     step="any"
-                     placeholder="150" />
-            </div>
-
-            <div>
-              <label>R Multiple</label>
-              <input id="tradeR"
-                     type="number"
-                     step="any"
-                     placeholder="2.0" />
-            </div>
-
-          </div>
-        </div>
-
-        <div class="form-section">
-
-          <h3>Execution Review</h3>
-
-          <div class="emotion-row">
-            <label>Entry Emotion</label>
-
-            <div class="emotion-options">
-              <button type="button" class="emotion" data-emotion="Calm">😌 Calm</button>
-              <button type="button" class="emotion" data-emotion="Confident">😎 Confident</button>
-              <button type="button" class="emotion" data-emotion="FOMO">😰 FOMO</button>
-              <button type="button" class="emotion" data-emotion="Fear">😨 Fear</button>
-              <button type="button" class="emotion" data-emotion="Revenge">😡 Revenge</button>
-            </div>
-          </div>
-
-          <label class="switch-row">
-            <input type="checkbox" id="tradePlanFollowed" />
-            <span class="switch"></span>
-            I followed my trading plan
-          </label>
-
-          <label>What was your reasoning?</label>
-          <textarea id="tradeReason"
-            class="large-textarea"
-            placeholder="Why did you take this trade?"></textarea>
-
-          <label>What did you learn?</label>
-          <textarea id="tradeLesson"
-            class="large-textarea"
-            placeholder="What would you repeat or change?"></textarea>
-
-          <label>Chart Screenshot</label>
-
-          <div class="upload-box" id="uploadBox">
-            <input type="file"
-                   id="tradeScreenshot"
-                   accept="image/*"
-                   hidden />
-
-            <div>🖼️</div>
-            <strong>Upload chart screenshot</strong>
-            <small>PNG, JPG or WEBP</small>
-          </div>
-
-          <img id="screenshotPreview"
-               class="screenshot-preview hidden" />
-
-        </div>
-
-        <div class="modal-footer">
-          <button type="button"
-                  class="outline-btn"
-                  id="cancelTrade">
-            Cancel
-          </button>
-
-          <button class="primary-btn" type="submit">
-            Save Trade
-          </button>
-        </div>
-
-      </form>
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+
+  <div class="brand">
+    <div class="brand-mark">T</div>
+    <div>
+      <strong>TradeFlow</strong>
+      <span>Trading Journal</span>
     </div>
   </div>
 
-  <div class="toast" id="toast"></div>
+  <nav class="nav">
+    <button class="nav-item active" data-page="dashboard">
+      <span>⌂</span> Dashboard
+    </button>
 
-  <script src="app.js"></script>
+    <button class="nav-item" data-page="journal">
+      <span>▤</span> Journal
+    </button>
+
+    <button class="nav-item" data-page="checklist">
+      <span>✓</span> Pre-Trade
+    </button>
+
+    <button class="nav-item" data-page="plan">
+      <span>◈</span> Trade Plan
+    </button>
+
+    <button class="nav-item" data-page="analytics">
+      <span>◒</span> Analytics
+    </button>
+  </nav>
+
+  <div class="sidebar-bottom">
+
+    <div class="discipline-mini">
+      <div class="mini-title">
+        <span>Discipline</span>
+        <strong id="sidebarDiscipline">0%</strong>
+      </div>
+
+      <div class="progress">
+        <div id="sidebarProgress"></div>
+      </div>
+
+      <small>Based on your journal</small>
+    </div>
+
+    <button class="settings-btn" id="backupBtn">
+      ⇩ Backup Data
+    </button>
+
+    <button class="settings-btn" id="importBtn">
+      ⇧ Import Data
+    </button>
+
+    <input type="file" id="importFile" accept=".json" hidden>
+
+  </div>
+</aside>
+
+
+<!-- MAIN -->
+<main class="main">
+
+  <header class="topbar">
+
+    <button class="mobile-menu" id="mobileMenu">
+      ☰
+    </button>
+
+    <div>
+      <h1 id="pageTitle">Dashboard</h1>
+      <p id="pageSubtitle">
+        Your trading performance at a glance.
+      </p>
+    </div>
+
+    <div class="top-actions">
+
+      <div class="market-status">
+        <span class="status-dot"></span>
+        Journal Active
+      </div>
+
+      <button class="primary-btn" id="newTradeBtn">
+        + Log Trade
+      </button>
+
+    </div>
+  </header>
+
+
+  <!-- DASHBOARD -->
+  <section class="page active" id="dashboard">
+
+    <div class="welcome-card">
+
+      <div>
+        <span class="eyebrow">TRADING SESSION</span>
+
+        <h2>
+          Trade your plan, not your emotions.
+        </h2>
+
+        <p>
+          Prepare your setup, control your risk, execute, then review.
+        </p>
+      </div>
+
+      <button
+        class="outline-btn"
+        data-page-target="checklist">
+        Start Pre-Trade →
+      </button>
+
+    </div>
+
+
+    <div class="stats-grid">
+
+      <div class="stat-card">
+        <span>Net P&L</span>
+        <strong id="statPnl">$0.00</strong>
+        <small id="statPnlSub">0 trades</small>
+      </div>
+
+      <div class="stat-card">
+        <span>Win Rate</span>
+        <strong id="statWinRate">0%</strong>
+        <small id="statWinSub">0 wins / 0 trades</small>
+      </div>
+
+      <div class="stat-card">
+        <span>Average R</span>
+        <strong id="statAvgR">0.00R</strong>
+        <small>Per trade</small>
+      </div>
+
+      <div class="stat-card">
+        <span>Discipline</span>
+        <strong id="statDiscipline">0%</strong>
+        <small>Plan compliance</small>
+      </div>
+
+    </div>
+
+
+    <div class="dashboard-grid">
+
+      <div class="panel">
+
+        <div class="panel-header">
+
+          <div>
+            <span class="eyebrow">PERFORMANCE</span>
+            <h3>Equity Curve</h3>
+          </div>
+
+          <span class="period-badge">
+            All Time
+          </span>
+
+        </div>
+
+        <div class="chart-container">
+          <svg
+            id="equityChart"
+            viewBox="0 0 800 280"
+            preserveAspectRatio="none">
+          </svg>
+        </div>
+
+      </div>
+
+
+      <div class="panel">
+
+        <div class="panel-header">
+
+          <div>
+            <span class="eyebrow">TODAY</span>
+            <h3>Session Checklist</h3>
+          </div>
+
+          <button
+            class="text-btn"
+            data-page-target="checklist">
+            Open
+          </button>
+
+        </div>
+
+        <div
+          id="dashboardChecklist"
+          class="compact-checklist">
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div>
+          <span class="eyebrow">RECENT ACTIVITY</span>
+          <h3>Recent Trades</h3>
+        </div>
+
+        <button
+          class="text-btn"
+          data-page-target="journal">
+          View Journal →
+        </button>
+
+      </div>
+
+      <div
+        id="recentTrades"
+        class="trade-table">
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- JOURNAL -->
+  <section class="page" id="journal">
+
+    <div class="page-toolbar">
+
+      <div class="search-box">
+        <span>⌕</span>
+
+        <input
+          id="journalSearch"
+          placeholder="Search symbol, setup, notes...">
+      </div>
+
+      <select id="journalFilter">
+
+        <option value="all">
+          All Trades
+        </option>
+
+        <option value="wins">
+          Wins
+        </option>
+
+        <option value="losses">
+          Losses
+        </option>
+
+        <option value="rule">
+          Plan Followed
+        </option>
+
+        <option value="broken">
+          Rule Broken
+        </option>
+
+      </select>
+
+      <button
+        class="primary-btn"
+        id="journalNewTrade">
+        + New Trade
+      </button>
+
+    </div>
+
+
+    <div class="journal-layout">
+
+      <div
+        class="journal-list"
+        id="journalList">
+      </div>
+
+      <div
+        class="journal-empty"
+        id="journalEmpty">
+
+        <div class="empty-icon">
+          ▤
+        </div>
+
+        <h3>No trade selected</h3>
+
+        <p>
+          Select a trade from your journal to review
+          the full execution.
+        </p>
+
+      </div>
+
+      <div
+        class="journal-detail hidden"
+        id="journalDetail">
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- CHECKLIST -->
+  <section class="page" id="checklist">
+
+    <div class="section-heading">
+
+      <div>
+
+        <span class="eyebrow">
+          BEFORE YOU ENTER
+        </span>
+
+        <h2>
+          Pre-Trade Checklist
+        </h2>
+
+        <p>
+          If the setup is not clear, the trade is not ready.
+        </p>
+
+      </div>
+
+      <div class="check-score">
+
+        <strong id="checkScore">
+          0%
+        </strong>
+
+        <span>Ready</span>
+
+      </div>
+
+    </div>
+
+
+    <div class="checklist-grid">
+
+      <div class="panel">
+
+        <div class="panel-header">
+          <h3>1. Market Context</h3>
+        </div>
+
+        <div class="check-item">
+          <input type="checkbox" data-check="trend">
+          <div>
+            <strong>Higher timeframe bias is clear</strong>
+            <small>Trend, range, or transition identified.</small>
+          </div>
+        </div>
+
+        <div class="check-item">
+          <input type="checkbox" data-check="levels">
+          <div>
+            <strong>Important levels marked</strong>
+            <small>Support, resistance, liquidity, structure.</small>
+          </div>
+        </div>
+
+        <div class="check-item">
+          <input type="checkbox" data-check="news">
+          <div>
+            <strong>No dangerous news window</strong>
+            <small>Major events checked.</small>
+          </div>
+        </div>
+
+      </div>
+
+
+      <div class="panel">
+
+        <div class="panel-header">
+          <h3>2. Setup Quality</h3>
+        </div>
+
+        <div class="check-item">
+          <input type="checkbox" data-check="setup">
+          <div>
+            <strong>My exact setup is present</strong>
+            <small>No improvising or chasing price.</small>
+          </div>
+        </div>
+
+        <div class="check-item">
+          <input type="checkbox" data-check="entry">
+          <div>
+            <strong>Entry trigger is confirmed</strong>
+            <small>Predefined entry condition occurred.</small>
+          </div>
+        </div>
+
+        <div class="check-item">
+          <input type="checkbox" data-check="rr">
+          <div>
+            <strong>Risk/reward is acceptable</strong>
+            <small>Enough room to justify the risk.</small>
+          </div>
+        </div>
+
+      </div>
+
+
+      <div class="panel">
+
+        <div class="panel-header">
+          <h3>3. Risk Management</h3>
+        </div>
+
+        <div class="check-item">
+          <input type="checkbox" data-check="risk">
+          <div>
+            <strong>Risk amount is known</strong>
+            <small>Position size is based on predefined risk.</small>
+          </div>
+        </div>
+
+        <div class="check-item">
+          <input type="checkbox" data-check="stop">
+          <div>
+            <strong>Stop loss is defined</strong>
+            <small>Invalidation level is clear.</small>
+          </div>
+        </div>
+
+        <div class="check-item">
+          <input type="checkbox" data-check="target">
+          <div>
+            <strong>Target is defined</strong>
+            <small>Know where the idea should work.</small>
+          </div>
+        </div>
+
+      </div>
+
+
+      <div class="panel">
+
+        <div class="panel-header">
+          <h3>4. Psychology</h3>
+        </div>
+
+        <div class="check-item">
+          <input type="checkbox" data-check="calm">
+          <div>
+            <strong>I am calm</strong>
+            <small>Not angry, desperate or afraid.</small>
+          </div>
+        </div>
+
+        <div class="check-item">
+          <input type="checkbox" data-check="revenge">
+          <div>
+            <strong>This is not revenge trading</strong>
+            <small>Not trying to recover a previous loss.</small>
+          </div>
+        </div>
+
+        <div class="check-item">
+          <input type="checkbox" data-check="fomo">
+          <div>
+            <strong>I am not chasing</strong>
+            <small>Missing the trade is acceptable.</small>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div
+      class="ready-card"
+      id="readyCard">
+
+      <div>
+
+        <span class="ready-icon">
+          ✓
+        </span>
+
+        <div>
+
+          <strong>
+            Complete your checklist
+          </strong>
+
+          <p>
+            Every unchecked item is a reason
+            to pause before entering.
+          </p>
+
+        </div>
+
+      </div>
+
+      <button
+        class="primary-btn"
+        id="resetChecklist">
+        Reset Checklist
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- PLAN -->
+  <section class="page" id="plan">
+
+    <div class="section-heading">
+
+      <div>
+
+        <span class="eyebrow">
+          YOUR PLAYBOOK
+        </span>
+
+        <h2>
+          Trading Plan
+        </h2>
+
+        <p>
+          Define the rules before the market opens.
+        </p>
+
+      </div>
+
+      <button
+        class="primary-btn"
+        id="savePlan">
+        Save Plan
+      </button>
+
+    </div>
+
+
+    <div class="plan-grid">
+
+      <div class="panel">
+
+        <div class="panel-header">
+          <h3>Strategy</h3>
+        </div>
+
+        <label>Plan Name</label>
+
+        <input
+          id="planName"
+          class="form-input"
+          placeholder="London Breakout">
+
+        <label>Markets</label>
+
+        <input
+          id="planMarkets"
+          class="form-input"
+          placeholder="EURUSD, GBPUSD, XAUUSD">
+
+        <label>Trading Sessions</label>
+
+        <input
+          id="planSession"
+          class="form-input"
+          placeholder="London / New York">
+
+        <label>Market Conditions</label>
+
+        <textarea
+          id="planContext"
+          class="large-textarea"
+          placeholder="Describe when this strategy is valid...">
+        </textarea>
+
+      </div>
+
+
+      <div class="panel">
+
+        <div class="panel-header">
+          <h3>Entry Rules</h3>
+        </div>
+
+        <textarea
+          id="planEntry"
+          class="large-textarea"
+          placeholder="1. Higher timeframe bias...
+2. Price reaches key level...
+3. Confirmation candle...
+4. Entry trigger...">
+        </textarea>
+
+      </div>
+
+
+      <div class="panel">
+
+        <div class="panel-header">
+          <h3>Risk Rules</h3>
+        </div>
+
+        <div class="two-col">
+
+          <div>
+            <label>Risk Per Trade %</label>
+
+            <input
+              id="planRisk"
+              type="number"
+              class="form-input"
+              value="1"
+              step="0.1">
+          </div>
+
+          <div>
+            <label>Minimum R:R</label>
+
+            <input
+              id="planRR"
+              type="number"
+              class="form-input"
+              value="2"
+              step="0.1">
+          </div>
+
+        </div>
+
+        <label>Daily Loss Limit</label>
+
+        <input
+          id="planDailyLoss"
+          class="form-input"
+          placeholder="$500">
+
+        <label>Maximum Trades / Day</label>
+
+        <input
+          id="planMaxTrades"
+          type="number"
+          class="form-input"
+          value="3">
+
+      </div>
+
+
+      <div class="panel">
+
+        <div class="panel-header">
+          <h3>Management Rules</h3>
+        </div>
+
+        <textarea
+          id="planManagement"
+          class="large-textarea"
+          placeholder="Where do you take partials?
+When can you move stop?
+When is the setup invalid?
+What do you do after a loss?">
+        </textarea>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- ANALYTICS -->
+  <section class="page" id="analytics">
+
+    <div class="section-heading">
+
+      <div>
+
+        <span class="eyebrow">
+          REVIEW
+        </span>
+
+        <h2>
+          Performance Analytics
+        </h2>
+
+        <p>
+          Find patterns in your execution.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="stats-grid">
+
+      <div class="stat-card">
+        <span>Total Trades</span>
+        <strong id="analyticsTrades">0</strong>
+      </div>
+
+      <div class="stat-card">
+        <span>Profit Factor</span>
+        <strong id="analyticsPF">0.00</strong>
+      </div>
+
+      <div class="stat-card">
+        <span>Best Trade</span>
+        <strong id="analyticsBest">$0</strong>
+      </div>
+
+      <div class="stat-card">
+        <span>Worst Trade</span>
+        <strong id="analyticsWorst">$0</strong>
+      </div>
+
+    </div>
+
+
+    <div class="analytics-grid">
+
+      <div class="panel">
+
+        <div class="panel-header">
+          <h3>Results by Setup</h3>
+        </div>
+
+        <div id="setupAnalytics"></div>
+
+      </div>
+
+      <div class="panel">
+
+        <div class="panel-header">
+          <h3>Emotions</h3>
+        </div>
+
+        <div id="emotionAnalytics"></div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<!-- TRADE MODAL -->
+<div
+  class="modal-overlay"
+  id="tradeModal">
+
+  <div class="modal">
+
+    <div class="modal-header">
+
+      <div>
+        <span class="eyebrow">
+          JOURNAL ENTRY
+        </span>
+
+        <h2>
+          Log Trade
+        </h2>
+      </div>
+
+      <button
+        class="close-btn"
+        id="closeModal"
+        type="button">
+        ×
+      </button>
+
+    </div>
+
+
+    <form id="tradeForm">
+
+      <div class="form-section">
+
+        <h3>
+          Trade Details
+        </h3>
+
+        <div class="form-grid">
+
+          <div>
+            <label>Date</label>
+
+            <input
+              id="tradeDate"
+              type="date"
+              required>
+          </div>
+
+          <div>
+            <label>Symbol</label>
+
+            <input
+              id="tradeSymbol"
+              placeholder="EURUSD"
+              required>
+          </div>
+
+          <div>
+            <label>Direction</label>
+
+            <select id="tradeDirection">
+              <option value="Long">Long</option>
+              <option value="Short">Short</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Setup</label>
+
+            <input
+              id="tradeSetup"
+              placeholder="Breakout">
+          </div>
+
+          <div>
+            <label>Entry</label>
+
+            <input
+              id="tradeEntry"
+              type="number"
+              step="any"
+              placeholder="1.0850">
+          </div>
+
+          <div>
+            <label>Stop Loss</label>
+
+            <input
+              id="tradeStop"
+              type="number"
+              step="any"
+              placeholder="1.0820">
+          </div>
+
+          <div>
+            <label>Target</label>
+
+            <input
+              id="tradeTarget"
+              type="number"
+              step="any"
+              placeholder="1.0910">
+          </div>
+
+          <div>
+            <label>Exit</label>
+
+            <input
+              id="tradeExit"
+              type="number"
+              step="any"
+              placeholder="1.0890">
+          </div>
+
+          <div>
+            <label>P&L ($)</label>
+
+            <input
+              id="tradePnl"
+              type="number"
+              step="any"
+              placeholder="150">
+          </div>
+
+          <div>
+            <label>R Multiple</label>
+
+            <input
+              id="tradeR"
+              type="number"
+              step="any"
+              placeholder="2.0">
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="form-section">
+
+        <h3>
+          Execution Review
+        </h3>
+
+        <label>
+          Entry Emotion
+        </label>
+
+        <div class="emotion-options">
+
+          <button
+            type="button"
+            class="emotion"
+            data-emotion="Calm">
+            😌 Calm
+          </button>
+
+          <button
+            type="button"
+            class="emotion"
+            data-emotion="Confident">
+            😎 Confident
+          </button>
+
+          <button
+            type="button"
+            class="emotion"
+            data-emotion="FOMO">
+            😰 FOMO
+          </button>
+
+          <button
+            type="button"
+            class="emotion"
+            data-emotion="Fear">
+            😨 Fear
+          </button>
+
+          <button
+            type="button"
+            class="emotion"
+            data-emotion="Revenge">
+            😡 Revenge
+          </button>
+
+        </div>
+
+
+        <label class="switch-row">
+
+          <input
+            type="checkbox"
+            id="tradePlanFollowed">
+
+          <span>
+            I followed my trading plan
+          </span>
+
+        </label>
+
+
+        <label>
+          What was your reasoning?
+        </label>
+
+        <textarea
+          id="tradeReason"
+          class="large-textarea"
+          placeholder="Why did you take this trade?">
+        </textarea>
+
+
+        <label>
+          What did you learn?
+        </label>
+
+        <textarea
+          id="tradeLesson"
+          class="large-textarea"
+          placeholder="What would you repeat or change?">
+        </textarea>
+
+
+        <label>
+          Chart Screenshot
+        </label>
+
+        <div
+          class="upload-box"
+          id="uploadBox">
+
+          <input
+            type="file"
+            id="tradeScreenshot"
+            accept="image/*"
+            hidden>
+
+          <div>🖼️</div>
+
+          <strong>
+            Upload chart screenshot
+          </strong>
+
+          <small>
+            PNG, JPG or WEBP
+          </small>
+
+        </div>
+
+
+        <img
+          id="screenshotPreview"
+          class="screenshot-preview hidden">
+
+      </div>
+
+
+      <div class="modal-footer">
+
+        <button
+          type="button"
+          class="outline-btn"
+          id="cancelTrade">
+          Cancel
+        </button>
+
+        <button
+          class="primary-btn"
+          type="submit">
+          Save Trade
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+<div
+  class="toast"
+  id="toast">
+</div>
+
+
+<script>
+/* =========================================================
+   TRADEFLOW - SINGLE FILE VERSION
+   ========================================================= */
+
+const STORAGE_KEY = "tradeflow-data-v2";
+
+const defaultData = {
+  trades: [],
+  checklist: {},
+  plan: {
+    name: "",
+    markets: "",
+    session: "",
+    context: "",
+    entry: "",
+    risk: 1,
+    rr: 2,
+    dailyLoss: "",
+    maxTrades: 3,
+    management: ""
+  }
+};
+
+let data = loadData();
+let selectedTradeId = null;
+let selectedEmotion = "";
+let screenshotData = "";
+
+
+/* =========================================================
+   DATA
+   ========================================================= */
+
+function loadData() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+
+    if (!saved) {
+      return JSON.parse(JSON.stringify(defaultData));
+    }
+
+    const parsed = JSON.parse(saved);
+
+    return {
+      ...JSON.parse(JSON.stringify(defaultData)),
+      ...parsed,
+      plan: {
+        ...defaultData.plan,
+        ...(parsed.plan || {})
+      }
+    };
+
+  } catch (error) {
+    console.error("Could not load data:", error);
+    return JSON.parse(JSON.stringify(defaultData));
+  }
+}
+
+
+function saveData() {
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(data)
+  );
+}
+
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+
+function number(value) {
+  return Number(value) || 0;
+}
+
+
+function money(value) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2
+  }).format(number(value));
+}
+
+
+function today() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+
+function dateFormat(value) {
+  if (!value) return "-";
+
+  const date = new Date(value + "T00:00:00");
+
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  });
+}
+
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
+function showToast(message) {
+  const toast = document.getElementById("toast");
+
+  toast.textContent = message;
+  toast.classList.add("show");
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2200);
+}
+
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+const pageTitles = {
+
+  dashboard: [
+    "Dashboard",
+    "Your trading performance at a glance."
+  ],
+
+  journal: [
+    "Trade Journal",
+    "Review your execution."
+  ],
+
+  checklist: [
+    "Pre-Trade Checklist",
+    "Prepare before you execute."
+  ],
+
+  plan: [
+    "Trading Plan",
+    "Your rules should be clear before the market moves."
+  ],
+
+  analytics: [
+    "Analytics",
+    "Find patterns in your execution."
+  ]
+
+};
+
+
+function showPage(page) {
+
+  document.querySelectorAll(".page")
+    .forEach(element => {
+      element.classList.remove("active");
+    });
+
+  const target = document.getElementById(page);
+
+  if (!target) return;
+
+  target.classList.add("active");
+
+  document.querySelectorAll(".nav-item")
+    .forEach(button => {
+      button.classList.toggle(
+        "active",
+        button.dataset.page === page
+      );
+    });
+
+  document.getElementById("pageTitle").textContent =
+    pageTitles[page][0];
+
+  document.getElementById("pageSubtitle").textContent =
+    pageTitles[page][1];
+
+  if (page === "dashboard") renderDashboard();
+  if (page === "journal") renderJournal();
+  if (page === "checklist") renderChecklist();
+  if (page === "plan") renderPlan();
+  if (page === "analytics") renderAnalytics();
+
+  document.getElementById("sidebar")
+    .classList.remove("open");
+}
+
+
+document.querySelectorAll(".nav-item")
+  .forEach(button => {
+
+    button.addEventListener("click", () => {
+      showPage(button.dataset.page);
+    });
+
+  });
+
+
+document.querySelectorAll("[data-page-target]")
+  .forEach(button => {
+
+    button.addEventListener("click", () => {
+      showPage(button.dataset.pageTarget);
+    });
+
+  });
+
+
+document.getElementById("mobileMenu")
+  .addEventListener("click", () => {
+
+    document.getElementById("sidebar")
+      .classList.toggle("open");
+
+  });
+
+
+/* =========================================================
+   DASHBOARD
+   ========================================================= */
+
+function getStats() {
+
+  const trades = data.trades;
+
+  const pnl = trades.reduce(
+    (sum, trade) =>
+      sum + number(trade.pnl),
+    0
+  );
+
+  const wins = trades.filter(
+    trade => number(trade.pnl) > 0
+  ).length;
+
+  const averageR = trades.length
+    ? trades.reduce(
+        (sum, trade) =>
+          sum + number(trade.r),
+        0
+      ) / trades.length
+    : 0;
+
+  const followed = trades.filter(
+    trade => trade.planFollowed
+  ).length;
+
+  const discipline = trades.length
+    ? Math.round(
+        followed / trades.length * 100
+      )
+    : 0;
+
+  const grossProfit = trades
+    .filter(t => number(t.pnl) > 0)
+    .reduce(
+      (sum, t) => sum + number(t.pnl),
+      0
+    );
+
+  const grossLoss = Math.abs(
+    trades
+      .filter(t => number(t.pnl) < 0)
+      .reduce(
+        (sum, t) => sum + number(t.pnl),
+        0
+      )
+  );
+
+  const profitFactor =
+    grossLoss > 0
+      ? grossProfit / grossLoss
+      : grossProfit > 0
+        ? Infinity
+        : 0;
+
+  return {
+    pnl,
+    wins,
+    averageR,
+    discipline,
+    profitFactor
+  };
+}
+
+
+function renderDashboard() {
+
+  const stats = getStats();
+
+  const pnlElement =
+    document.getElementById("statPnl");
+
+  pnlElement.textContent =
+    money(stats.pnl);
+
+  pnlElement.className =
+    stats.pnl >= 0
+      ? "pnl-positive"
+      : "pnl-negative";
+
+  document.getElementById("statPnlSub")
+    .textContent =
+      `${data.trades.length} trade${data.trades.length === 1 ? "" : "s"}`;
+
+  const winRate = data.trades.length
+    ? Math.round(
+        stats.wins /
+        data.trades.length *
+        100
+      )
+    : 0;
+
+  document.getElementById("statWinRate")
+    .textContent =
+      `${winRate}%`;
+
+  document.getElementById("statWinSub")
+    .textContent =
+      `${stats.wins} wins / ${data.trades.length} trades`;
+
+  document.getElementById("statAvgR")
+    .textContent =
+      `${stats.averageR.toFixed(2)}R`;
+
+  document.getElementById("statDiscipline")
+    .textContent =
+      `${stats.discipline}%`;
+
+  document.getElementById("sidebarDiscipline")
+    .textContent =
+      `${stats.discipline}%`;
+
+  document.getElementById("sidebarProgress")
+    .style.width =
+      `${stats.discipline}%`;
+
+  renderEquityChart();
+  renderDashboardChecklist();
+  renderRecentTrades();
+}
+
+
+/* =========================================================
+   EQUITY CHART
+   ========================================================= */
+
+function renderEquityChart() {
+
+  const svg =
+    document.getElementById("equityChart");
+
+  if (!data.trades.length) {
+
+    svg.innerHTML = `
+      <text
+        x="400"
+        y="140"
+        fill="#566172"
+        text-anchor="middle"
+        font-size="14">
+        Log trades to build your equity curve
+      </text>
+    `;
+
+    return;
+  }
+
+  const sorted =
+    [...data.trades].sort(
+      (a, b) =>
+        a.date.localeCompare(b.date)
+    );
+
+  let equity = 0;
+
+  const values =
+    sorted.map(trade => {
+
+      equity += number(trade.pnl);
+
+      return equity;
+
+    });
+
+  const min =
+    Math.min(0, ...values);
+
+  const max =
+    Math.max(1, ...values);
+
+  const width = 800;
+  const height = 240;
+  const padding = 20;
+
+  const points =
+    values.map((value, index) => {
+
+      const x =
+        padding +
+        index /
+        Math.max(values.length - 1, 1) *
+        (width - padding * 2);
+
+      const normalized =
+        (value - min) /
+        (max - min || 1);
+
+      const y =
+        height -
+        padding -
+        normalized *
+        (height - padding * 2);
+
+      return `${x},${y}`;
+
+    });
+
+  svg.innerHTML = `
+
+    <defs>
+
+      <linearGradient
+        id="areaGradient"
+        x1="0"
+        x2="0"
+        y1="0"
+        y2="1">
+
+        <stop
+          offset="0%"
+          stop-color="#25d69b"
+          stop-opacity=".35">
+
+        </stop>
+
+        <stop
+          offset="100%"
+          stop-color="#25d69b"
+          stop-opacity="0">
+
+        </stop>
+
+      </linearGradient>
+
+    </defs>
+
+    <line
+      x1="20"
+      y1="60"
+      x2="780"
+      y2="60"
+      class="chart-grid">
+    </line>
+
+    <line
+      x1="20"
+      y1="140"
+      x2="780"
+      y2="140"
+      class="chart-grid">
+    </line>
+
+    <line
+      x1="20"
+      y1="220"
+      x2="780"
+      y2="220"
+      class="chart-grid">
+    </line>
+
+    <polyline
+      points="${points.join(" ")}"
+      class="chart-line">
+    </polyline>
+  `;
+}
+
+
+/* =========================================================
+   CHECKLIST
+   ========================================================= */
+
+const checklistLabels = {
+
+  trend: "Higher timeframe bias",
+  levels: "Important levels",
+  news: "News checked",
+  setup: "Exact setup",
+  entry: "Entry confirmed",
+  rr: "Risk/reward",
+  risk: "Risk calculated",
+  stop: "Stop defined",
+  target: "Target defined",
+  calm: "Calm mindset",
+  revenge: "No revenge trading",
+  fomo: "No FOMO"
+
+};
+
+
+function getChecklistScore() {
+
+  const keys =
+    Object.keys(checklistLabels);
+
+  const complete =
+    keys.filter(
+      key => data.checklist[key]
+    ).length;
+
+  return Math.round(
+    complete / keys.length * 100
+  );
+}
+
+
+function renderChecklist() {
+
+  document
+    .querySelectorAll("[data-check]")
+    .forEach(input => {
+
+      input.checked =
+        !!data.checklist[
+          input.dataset.check
+        ];
+
+    });
+
+  const score =
+    getChecklistScore();
+
+  document.getElementById("checkScore")
+    .textContent =
+      `${score}%`;
+
+  const card =
+    document.getElementById("readyCard");
+
+  if (score === 100) {
+
+    card.style.borderColor =
+      "#205b4b";
+
+    card.style.background =
+      "#0c211b";
+
+    card.querySelector("strong")
+      .textContent =
+        "Checklist complete — setup is ready";
+
+    card.querySelector("p")
+      .textContent =
+        "You have confirmed every item in your pre-trade process.";
+
+  } else {
+
+    card.style.borderColor =
+      "#392f18";
+
+    card.style.background =
+      "#17140b";
+
+    card.querySelector("strong")
+      .textContent =
+        "Complete your checklist";
+
+    card.querySelector("p")
+      .textContent =
+        "Every unchecked item is a reason to pause before entering.";
+  }
+}
+
+
+document
+  .querySelectorAll("[data-check]")
+  .forEach(input => {
+
+    input.addEventListener("change", () => {
+
+      data.checklist[
+        input.dataset.check
+      ] = input.checked;
+
+      saveData();
+
+      renderChecklist();
+      renderDashboard();
+
+    });
+
+  });
+
+
+document.getElementById("resetChecklist")
+  .addEventListener("click", () => {
+
+    data.checklist = {};
+
+    saveData();
+
+    renderChecklist();
+    renderDashboard();
+
+    showToast("Checklist reset");
+
+  });
+
+
+function renderDashboardChecklist() {
+
+  const container =
+    document.getElementById(
+      "dashboardChecklist"
+    );
+
+  container.innerHTML =
+    Object.entries(checklistLabels)
+      .slice(0, 6)
+      .map(([key, label]) => {
+
+        const done =
+          !!data.checklist[key];
+
+        return `
+          <div class="compact-item ${done ? "done" : ""}">
+            <span>${done ? "✓ " : ""}</span>
+            ${escapeHtml(label)}
+          </div>
+        `;
+
+      })
+      .join("");
+}
+
+
+/* =========================================================
+   JOURNAL
+   ========================================================= */
+
+function renderJournal() {
+
+  const search =
+    document.getElementById(
+      "journalSearch"
+    ).value.toLowerCase();
+
+  const filter =
+    document.getElementById(
+      "journalFilter"
+    ).value;
+
+  let trades =
+    [...data.trades];
+
+  if (search) {
+
+    trades =
+      trades.filter(trade => {
+
+        const text = [
+          trade.symbol,
+          trade.setup,
+          trade.reason,
+          trade.lesson,
+          trade.emotion
+        ]
+          .join(" ")
+          .toLowerCase();
+
+        return text.includes(search);
+      });
+  }
+
+  if (filter === "wins") {
+
+    trades =
+      trades.filter(
+        trade => number(trade.pnl) > 0
+      );
+
+  }
+
+  if (filter === "losses") {
+
+    trades =
+      trades.filter(
+        trade => number(trade.pnl) < 0
+      );
+
+  }
+
+  if (filter === "rule") {
+
+    trades =
+      trades.filter(
+        trade => trade.planFollowed
+      );
+
+  }
+
+  if (filter === "broken") {
+
+    trades =
+      trades.filter(
+        trade => !trade.planFollowed
+      );
+
+  }
+
+  trades.sort(
+    (a, b) =>
+      `${b.date}-${b.createdAt}`
+        .localeCompare(
+          `${a.date}-${a.createdAt}`
+        )
+  );
+
+  const list =
+    document.getElementById(
+      "journalList"
+    );
+
+  if (!trades.length) {
+
+    list.innerHTML = `
+      <div class="empty-state">
+        No trades match your filter.
+      </div>
+    `;
+
+    renderJournalDetail();
+
+    return;
+  }
+
+  list.innerHTML =
+    trades.map(trade => `
+
+      <div
+        class="journal-card ${selectedTradeId === trade.id ? "selected" : ""}"
+        data-trade-id="${trade.id}">
+
+        <div class="journal-card-top">
+
+          <span class="symbol">
+            ${escapeHtml(trade.symbol)}
+          </span>
+
+          <span class="journal-date">
+            ${dateFormat(trade.date)}
+          </span>
+
+        </div>
+
+        <div class="journal-card-bottom">
+
+          <span class="setup-tag">
+            ${escapeHtml(
+              trade.setup || "No setup"
+            )}
+          </span>
+
+          <strong class="${
+            number(trade.pnl) >= 0
+              ? "pnl-positive"
+              : "pnl-negative"
+          }">
+            ${money(trade.pnl)}
+          </strong>
+
+        </div>
+
+      </div>
+
+    `).join("");
+
+  document
+    .querySelectorAll(".journal-card")
+    .forEach(card => {
+
+      card.addEventListener("click", () => {
+
+        selectedTradeId =
+          card.dataset.tradeId;
+
+        renderJournal();
+        renderJournalDetail();
+
+      });
+
+    });
+
+  renderJournalDetail();
+}
+
+
+function renderJournalDetail() {
+
+  const empty =
+    document.getElementById(
+      "journalEmpty"
+    );
+
+  const detail =
+    document.getElementById(
+      "journalDetail"
+    );
+
+  const trade =
+    data.trades.find(
+      item => item.id === selectedTradeId
+    );
+
+  if (!trade) {
+
+    empty.classList.remove("hidden");
+    detail.classList.add("hidden");
+
+    return;
+  }
+
+  empty.classList.add("hidden");
+  detail.classList.remove("hidden");
+
+  const pnl =
+    number(trade.pnl);
+
+  detail.innerHTML = `
+
+    <div class="detail-header">
+
+      <div>
+
+        <span class="eyebrow">
+          ${escapeHtml(
+            trade.setup || "TRADE"
+          )}
+        </span>
+
+        <h2>
+          ${escapeHtml(trade.symbol)}
+          ·
+          <span class="${
+            trade.direction === "Long"
+              ? "pnl-positive"
+              : "pnl-negative"
+          }">
+            ${escapeHtml(trade.direction)}
+          </span>
+        </h2>
+
+        <p>
+          ${dateFormat(trade.date)}
+        </p>
+
+      </div>
+
+      <div class="${
+        pnl >= 0
+          ? "pnl-positive"
+          : "pnl-negative"
+      } detail-pnl">
+        ${money(pnl)}
+      </div>
+
+    </div>
+
+
+    <div class="detail-grid">
+
+      <div class="detail-stat">
+        <span>Entry</span>
+        <strong>${escapeHtml(trade.entry || "-")}</strong>
+      </div>
+
+      <div class="detail-stat">
+        <span>Stop</span>
+        <strong>${escapeHtml(trade.stop || "-")}</strong>
+      </div>
+
+      <div class="detail-stat">
+        <span>Target</span>
+        <strong>${escapeHtml(trade.target || "-")}</strong>
+      </div>
+
+      <div class="detail-stat">
+        <span>Exit</span>
+        <strong>${escapeHtml(trade.exit || "-")}</strong>
+      </div>
+
+      <div class="detail-stat">
+        <span>R Multiple</span>
+        <strong>${number(trade.r).toFixed(2)}R</strong>
+      </div>
+
+      <div class="detail-stat">
+        <span>Emotion</span>
+        <strong>${escapeHtml(
+          trade.emotion || "Not recorded"
+        )}</strong>
+      </div>
+
+      <div class="detail-stat">
+        <span>Plan</span>
+        <strong>
+          ${trade.planFollowed
+            ? "✓ Followed"
+            : "✕ Broken"}
+        </strong>
+      </div>
+
+      <div class="detail-stat">
+        <span>Direction</span>
+        <strong>${escapeHtml(
+          trade.direction
+        )}</strong>
+      </div>
+
+    </div>
+
+
+    <div class="detail-section">
+
+      <h3>
+        Trade Reasoning
+      </h3>
+
+      <p>
+        ${escapeHtml(
+          trade.reason ||
+          "No reasoning recorded."
+        )}
+      </p>
+
+    </div>
+
+
+    <div class="detail-section">
+
+      <h3>
+        Lesson
+      </h3>
+
+      <p>
+        ${escapeHtml(
+          trade.lesson ||
+          "No lesson recorded."
+        )}
+      </p>
+
+    </div>
+
+
+    ${
+      trade.screenshot
+        ? `
+          <div class="detail-section">
+
+            <h3>
+              Chart Screenshot
+            </h3>
+
+            <img
+              class="detail-screenshot"
+              src="${trade.screenshot}"
+              alt="Trade chart screenshot">
+
+          </div>
+        `
+        : ""
+    }
+
+
+    <div class="detail-section">
+
+      <button
+        class="outline-btn"
+        id="deleteTradeBtn">
+        Delete Trade
+      </button>
+
+    </div>
+  `;
+
+
+  document
+    .getElementById("deleteTradeBtn")
+    .addEventListener("click", () => {
+
+      if (
+        !confirm(
+          "Delete this trade permanently?"
+        )
+      ) {
+        return;
+      }
+
+      data.trades =
+        data.trades.filter(
+          item =>
+            item.id !== trade.id
+        );
+
+      selectedTradeId = null;
+
+      saveData();
+
+      renderDashboard();
+      renderJournal();
+      renderAnalytics();
+
+      showToast("Trade deleted");
+
+    });
+}
+
+
+/* =========================================================
+   RECENT TRADES
+   ========================================================= */
+
+function renderRecentTrades() {
+
+  const container =
+    document.getElementById(
+      "recentTrades"
+    );
+
+  if (!data.trades.length) {
+
+    container.innerHTML = `
+      <div class="empty-state">
+        No trades yet.
+        Start by logging your first trade.
+      </div>
+    `;
+
+    return;
+  }
+
+  const trades =
+    [...data.trades]
+      .sort(
+        (a, b) =>
+          `${b.date}-${b.createdAt}`
+            .localeCompare(
+              `${a.date}-${a.createdAt}`
+            )
+      )
+      .slice(0, 6);
+
+  container.innerHTML =
+    trades.map(trade => `
+
+      <div class="journal-card">
+
+        <div class="journal-card-top">
+
+          <span class="symbol">
+            ${escapeHtml(trade.symbol)}
+          </span>
+
+          <span class="journal-date">
+            ${dateFormat(trade.date)}
+          </span>
+
+        </div>
+
+        <div class="journal-card-bottom">
+
+          <span>
+            ${escapeHtml(
+              trade.direction
+            )}
+            ·
+            ${escapeHtml(
+              trade.setup || "No setup"
+            )}
+          </span>
+
+          <strong class="${
+            number(trade.pnl) >= 0
+              ? "pnl-positive"
+              : "pnl-negative"
+          }">
+            ${money(trade.pnl)}
+          </strong>
+
+        </div>
+
+      </div>
+
+    `).join("");
+}
+
+
+/* =========================================================
+   TRADING PLAN
+   ========================================================= */
+
+function renderPlan() {
+
+  document.getElementById("planName").value =
+    data.plan.name || "";
+
+  document.getElementById("planMarkets").value =
+    data.plan.markets || "";
+
+  document.getElementById("planSession").value =
+    data.plan.session || "";
+
+  document.getElementById("planContext").value =
+    data.plan.context || "";
+
+  document.getElementById("planEntry").value =
+    data.plan.entry || "";
+
+  document.getElementById("planRisk").value =
+    data.plan.risk ?? 1;
+
+  document.getElementById("planRR").value =
+    data.plan.rr ?? 2;
+
+  document.getElementById("planDailyLoss").value =
+    data.plan.dailyLoss || "";
+
+  document.getElementById("planMaxTrades").value =
+    data.plan.maxTrades ?? 3;
+
+  document.getElementById("planManagement").value =
+    data.plan.management || "";
+}
+
+
+document.getElementById("savePlan")
+  .addEventListener("click", () => {
+
+    data.plan = {
+
+      name:
+        document.getElementById(
+          "planName"
+        ).value,
+
+      markets:
+        document.getElementById(
+          "planMarkets"
+        ).value,
+
+      session:
+        document.getElementById(
+          "planSession"
+        ).value,
+
+      context:
+        document.getElementById(
+          "planContext"
+        ).value,
+
+      entry:
+        document.getElementById(
+          "planEntry"
+        ).value,
+
+      risk:
+        number(
+          document.getElementById(
+            "planRisk"
+          ).value
+        ),
+
+      rr:
+        number(
+          document.getElementById(
+            "planRR"
+          ).value
+        ),
+
+      dailyLoss:
+        document.getElementById(
+          "planDailyLoss"
+        ).value,
+
+      maxTrades:
+        number(
+          document.getElementById(
+            "planMaxTrades"
+          ).value
+        ),
+
+      management:
+        document.getElementById(
+          "planManagement"
+        ).value
+
+    };
+
+    saveData();
+
+    showToast(
+      "Trading plan saved"
+    );
+
+  });
+
+
+/* =========================================================
+   TRADE MODAL
+   ========================================================= */
+
+const modal =
+  document.getElementById(
+    "tradeModal"
+  );
+
+
+function openTradeModal() {
+
+  modal.classList.add("active");
+
+  document.getElementById(
+    "tradeDate"
+  ).value = today();
+
+  selectedEmotion = "";
+  screenshotData = "";
+
+  document
+    .querySelectorAll(".emotion")
+    .forEach(button => {
+      button.classList.remove(
+        "selected"
+      );
+    });
+
+  document
+    .getElementById(
+      "screenshotPreview"
+    )
+    .classList.add("hidden");
+
+}
+
+
+function closeTradeModal() {
+
+  modal.classList.remove("active");
+
+}
+
+
+document.getElementById("newTradeBtn")
+  .addEventListener(
+    "click",
+    openTradeModal
+  );
+
+
+document.getElementById("journalNewTrade")
+  .addEventListener(
+    "click",
+    openTradeModal
+  );
+
+
+document.getElementById("closeModal")
+  .addEventListener(
+    "click",
+    closeTradeModal
+  );
+
+
+document.getElementById("cancelTrade")
+  .addEventListener(
+    "click",
+    closeTradeModal
+  );
+
+
+modal.addEventListener(
+  "click",
+  event => {
+
+    if (event.target === modal) {
+      closeTradeModal();
+    }
+
+  }
+);
+
+
+/* EMOTIONS */
+
+document
+  .querySelectorAll(".emotion")
+  .forEach(button => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        document
+          .querySelectorAll(".emotion")
+          .forEach(item => {
+            item.classList.remove(
+              "selected"
+            );
+          });
+
+        button.classList.add(
+          "selected"
+        );
+
+        selectedEmotion =
+          button.dataset.emotion;
+
+      }
+    );
+
+  });
+
+
+/* SCREENSHOT */
+
+document.getElementById("uploadBox")
+  .addEventListener(
+    "click",
+    () => {
+
+      document
+        .getElementById(
+          "tradeScreenshot"
+        )
+        .click();
+
+    }
+  );
+
+
+document
+  .getElementById("tradeScreenshot")
+  .addEventListener(
+    "change",
+    event => {
+
+      const file =
+        event.target.files?.[0];
+
+      if (!file) return;
+
+      const reader =
+        new FileReader();
+
+      reader.onload = () => {
+
+        screenshotData =
+          reader.result;
+
+        const preview =
+          document.getElementById(
+            "screenshotPreview"
+          );
+
+        preview.src =
+          screenshotData;
+
+        preview.classList.remove(
+          "hidden"
+        );
+
+      };
+
+      reader.readAsDataURL(file);
+
+    }
+  );
+
+
+/* SAVE TRADE */
+
+document.getElementById("tradeForm")
+  .addEventListener(
+    "submit",
+    event => {
+
+      event.preventDefault();
+
+      const trade = {
+
+        id:
+          Date.now().toString(36) +
+          Math.random()
+            .toString(36)
+            .slice(2),
+
+        createdAt:
+          Date.now(),
+
+        date:
+          document.getElementById(
+            "tradeDate"
+          ).value || today(),
+
+        symbol:
+          document.getElementById(
+            "tradeSymbol"
+          ).value
+            .trim()
+            .toUpperCase(),
+
+        direction:
+          document.getElementById(
+            "tradeDirection"
+          ).value,
+
+        setup:
+          document.getElementById(
+            "tradeSetup"
+          ).value.trim(),
+
+        entry:
+          document.getElementById(
+            "tradeEntry"
+          ).value,
+
+        stop:
+          document.getElementById(
+            "tradeStop"
+          ).value,
+
+        target:
+          document.getElementById(
+            "tradeTarget"
+          ).value,
+
+        exit:
+          document.getElementById(
+            "tradeExit"
+          ).value,
+
+        pnl:
+          number(
+            document.getElementById(
+              "tradePnl"
+            ).value
+          ),
+
+        r:
+          number(
+            document.getElementById(
+              "tradeR"
+            ).value
+          ),
+
+        emotion:
+          selectedEmotion,
+
+        planFollowed:
+          document.getElementById(
+            "tradePlanFollowed"
+          ).checked,
+
+        reason:
+          document.getElementById(
+            "tradeReason"
+          ).value,
+
+        lesson:
+          document.getElementById(
+            "tradeLesson"
+          ).value,
+
+        screenshot:
+          screenshotData
+
+      };
+
+
+      if (!trade.symbol) {
+
+        showToast(
+          "Enter a symbol"
+        );
+
+        return;
+      }
+
+
+      data.trades.push(
+        trade
+      );
+
+      saveData();
+
+      selectedTradeId =
+        trade.id;
+
+      document
+        .getElementById(
+          "tradeForm"
+        )
+        .reset();
+
+      selectedEmotion = "";
+      screenshotData = "";
+
+      document
+        .querySelectorAll(".emotion")
+        .forEach(button => {
+          button.classList.remove(
+            "selected"
+          );
+        });
+
+      document
+        .getElementById(
+          "screenshotPreview"
+        )
+        .classList.add("hidden");
+
+      closeTradeModal();
+
+      renderDashboard();
+      renderJournal();
+      renderAnalytics();
+
+      showToast(
+        "Trade saved to journal"
+      );
+
+      showPage("journal");
+
+    }
+  );
+
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+document
+  .getElementById("journalSearch")
+  .addEventListener(
+    "input",
+    renderJournal
+  );
+
+
+document
+  .getElementById("journalFilter")
+  .addEventListener(
+    "change",
+    renderJournal
+  );
+
+
+/* =========================================================
+   ANALYTICS
+   ========================================================= */
+
+function renderAnalytics() {
+
+  const trades =
+    data.trades;
+
+  const stats =
+    getStats();
+
+  document.getElementById(
+    "analyticsTrades"
+  ).textContent =
+    trades.length;
+
+  document.getElementById(
+    "analyticsPF"
+  ).textContent =
+    stats.profitFactor === Infinity
+      ? "∞"
+      : stats.profitFactor.toFixed(2);
+
+  const pnlValues =
+    trades.map(
+      t => number(t.pnl)
+    );
+
+  document.getElementById(
+    "analyticsBest"
+  ).textContent =
+    trades.length
+      ? money(Math.max(...pnlValues))
+      : "$0";
+
+  document.getElementById(
+    "analyticsWorst"
+  ).textContent =
+    trades.length
+      ? money(Math.min(...pnlValues))
+      : "$0";
+
+  renderSetupAnalytics();
+  renderEmotionAnalytics();
+}
+
+
+function renderSetupAnalytics() {
+
+  const container =
+    document.getElementById(
+      "setupAnalytics"
+    );
+
+  const groups = {};
+
+  data.trades.forEach(trade => {
+
+    const setup =
+      trade.setup ||
+      "Unspecified";
+
+    if (!groups[setup]) {
+
+      groups[setup] = {
+        pnl: 0,
+        trades: 0
+      };
+
+    }
+
+    groups[setup].pnl +=
+      number(trade.pnl);
+
+    groups[setup].trades++;
+
+  });
+
+
+  const entries =
+    Object.entries(groups)
+      .sort(
+        (a, b) =>
+          b[1].pnl -
+          a[1].pnl
+      );
+
+
+  if (!entries.length) {
+
+    container.innerHTML = `
+      <div class="empty-state">
+        Your setup analytics
+        will appear here.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  const max =
+    Math.max(
+      ...entries.map(
+        item =>
+          Math.abs(
+            item[1].pnl
+          )
+      ),
+      1
+    );
+
+
+  container.innerHTML =
+    entries.map(
+      ([name, value]) => {
+
+        const width =
+          Math.min(
+            100,
+            Math.abs(
+              value.pnl
+            ) / max * 100
+          );
+
+        return `
+
+          <div class="analytics-row">
+
+            <div class="analytics-row-top">
+
+              <span>
+                ${escapeHtml(name)}
+              </span>
+
+              <strong class="${
+                value.pnl >= 0
+                  ? "pnl-positive"
+                  : "pnl-negative"
+              }">
+                ${money(value.pnl)}
+              </strong>
+
+            </div>
+
+            <div class="analytics-bar">
+
+              <div
+                style="
+                  width:${width}%;
+                  background:${
+                    value.pnl >= 0
+                      ? "var(--green)"
+                      : "var(--red)"
+                  };
+                ">
+              </div>
+
+            </div>
+
+          </div>
+        `;
+
+      }
+    ).join("");
+
+}
+
+
+function renderEmotionAnalytics() {
+
+  const container =
+    document.getElementById(
+      "emotionAnalytics"
+    );
+
+  const groups = {};
+
+  data.trades.forEach(trade => {
+
+    const emotion =
+      trade.emotion ||
+      "Not recorded";
+
+    if (!groups[emotion]) {
+
+      groups[emotion] = {
+        pnl: 0,
+        trades: 0
+      };
+
+    }
+
+    groups[emotion].pnl +=
+      number(trade.pnl);
+
+    groups[emotion].trades++;
+
+  });
+
+
+  const entries =
+    Object.entries(groups)
+      .sort(
+        (a, b) =>
+          b[1].pnl -
+          a[1].pnl
+      );
+
+
+  if (!entries.length) {
+
+    container.innerHTML = `
+      <div class="empty-state">
+        Add emotions to your trades
+        to find psychology patterns.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  container.innerHTML =
+    entries.map(
+      ([emotion, value]) => `
+
+        <div class="analytics-row">
+
+          <div class="analytics-row-top">
+
+            <span>
+              ${escapeHtml(emotion)}
+            </span>
+
+            <strong class="${
+              value.pnl >= 0
+                ? "pnl-positive"
+                : "pnl-negative"
+            }">
+              ${money(value.pnl)}
+            </strong>
+
+          </div>
+
+          <div style="
+            color:#566172;
+            font-size:11px;
+          ">
+            ${value.trades}
+            trade${value.trades === 1 ? "" : "s"}
+          </div>
+
+        </div>
+
+      `
+    ).join("");
+
+}
+
+
+/* =========================================================
+   BACKUP
+   ========================================================= */
+
+document.getElementById("backupBtn")
+  .addEventListener(
+    "click",
+    () => {
+
+      const blob =
+        new Blob(
+          [
+            JSON.stringify(
+              data,
+              null,
+              2
+            )
+          ],
+          {
+            type:
+              "application/json"
+          }
+        );
+
+      const url =
+        URL.createObjectURL(
+          blob
+        );
+
+      const a =
+        document.createElement(
+          "a"
+        );
+
+      a.href = url;
+
+      a.download =
+        `tradeflow-backup-${today()}.json`;
+
+      document.body.appendChild(a);
+
+      a.click();
+
+      a.remove();
+
+      URL.revokeObjectURL(url);
+
+      showToast(
+        "Backup downloaded"
+      );
+
+    }
+  );
+
+
+/* =========================================================
+   IMPORT
+   ========================================================= */
+
+document.getElementById("importBtn")
+  .addEventListener(
+    "click",
+    () => {
+
+      document
+        .getElementById(
+          "importFile"
+        )
+        .click();
+
+    }
+  );
+
+
+document
+  .getElementById("importFile")
+  .addEventListener(
+    "change",
+    event => {
+
+      const file =
+        event.target.files?.[0];
+
+      if (!file) return;
+
+      const reader =
+        new FileReader();
+
+      reader.onload = () => {
+
+        try {
+
+          const imported =
+            JSON.parse(
+              reader.result
+            );
+
+          if (
+            !imported ||
+            !Array.isArray(
+              imported.trades
+            )
+          ) {
+
+            throw new Error(
+              "Invalid backup"
+            );
+
+          }
+
+          data = {
+
+            ...JSON.parse(
+              JSON.stringify(
+                defaultData
+              )
+            ),
+
+            ...imported,
+
+            plan: {
+              ...defaultData.plan,
+              ...(imported.plan || {})
+            }
+
+          };
+
+          saveData();
+
+          renderDashboard();
+          renderJournal();
+          renderChecklist();
+          renderPlan();
+          renderAnalytics();
+
+          showToast(
+            "Backup imported"
+          );
+
+        } catch (error) {
+
+          console.error(error);
+
+          showToast(
+            "Invalid backup file"
+          );
+
+        }
+
+      };
+
+      reader.readAsText(file);
+
+      event.target.value = "";
+
+    }
+  );
+
+
+/* =========================================================
+   KEYBOARD
+   ========================================================= */
+
+document.addEventListener(
+  "keydown",
+  event => {
+
+    const tag =
+      document.activeElement?.tagName;
+
+    if (
+      event.key.toLowerCase() === "n" &&
+      ![
+        "INPUT",
+        "TEXTAREA",
+        "SELECT"
+      ].includes(tag)
+    ) {
+
+      openTradeModal();
+
+    }
+
+    if (
+      event.key === "Escape"
+    ) {
+
+      closeTradeModal();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   INITIALIZE
+   ========================================================= */
+
+document.getElementById("tradeDate")
+  .value = today();
+
+renderDashboard();
+renderJournal();
+renderChecklist();
+renderPlan();
+renderAnalytics();
+
+</script>
+
 </body>
 </html>
+```
